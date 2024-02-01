@@ -9,6 +9,7 @@ import (
 	"siliconvali/ent/mainiot"
 	"siliconvali/ent/role"
 	"siliconvali/ent/user"
+	"siliconvali/ent/userpaymentplan"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -80,6 +81,34 @@ func (uc *UserCreate) SetNationalCode(s string) *UserCreate {
 func (uc *UserCreate) SetNillableNationalCode(s *string) *UserCreate {
 	if s != nil {
 		uc.SetNationalCode(*s)
+	}
+	return uc
+}
+
+// SetActive sets the "active" field.
+func (uc *UserCreate) SetActive(b bool) *UserCreate {
+	uc.mutation.SetActive(b)
+	return uc
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (uc *UserCreate) SetNillableActive(b *bool) *UserCreate {
+	if b != nil {
+		uc.SetActive(*b)
+	}
+	return uc
+}
+
+// SetDeleted sets the "deleted" field.
+func (uc *UserCreate) SetDeleted(b bool) *UserCreate {
+	uc.mutation.SetDeleted(b)
+	return uc
+}
+
+// SetNillableDeleted sets the "deleted" field if the given value is not nil.
+func (uc *UserCreate) SetNillableDeleted(b *bool) *UserCreate {
+	if b != nil {
+		uc.SetDeleted(*b)
 	}
 	return uc
 }
@@ -162,6 +191,21 @@ func (uc *UserCreate) AddMainiots(m ...*MainIot) *UserCreate {
 	return uc.AddMainiotIDs(ids...)
 }
 
+// AddUserpaymentplanIDs adds the "userpaymentplans" edge to the UserPaymentPlan entity by IDs.
+func (uc *UserCreate) AddUserpaymentplanIDs(ids ...int64) *UserCreate {
+	uc.mutation.AddUserpaymentplanIDs(ids...)
+	return uc
+}
+
+// AddUserpaymentplans adds the "userpaymentplans" edges to the UserPaymentPlan entity.
+func (uc *UserCreate) AddUserpaymentplans(u ...*UserPaymentPlan) *UserCreate {
+	ids := make([]int64, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uc.AddUserpaymentplanIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uc *UserCreate) Mutation() *UserMutation {
 	return uc.mutation
@@ -197,6 +241,14 @@ func (uc *UserCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (uc *UserCreate) defaults() {
+	if _, ok := uc.mutation.Active(); !ok {
+		v := user.DefaultActive
+		uc.mutation.SetActive(v)
+	}
+	if _, ok := uc.mutation.Deleted(); !ok {
+		v := user.DefaultDeleted
+		uc.mutation.SetDeleted(v)
+	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		v := user.DefaultCreatedAt()
 		uc.mutation.SetCreatedAt(v)
@@ -236,6 +288,12 @@ func (uc *UserCreate) check() error {
 		if err := user.NationalCodeValidator(v); err != nil {
 			return &ValidationError{Name: "national_code", err: fmt.Errorf(`ent: validator failed for field "User.national_code": %w`, err)}
 		}
+	}
+	if _, ok := uc.mutation.Active(); !ok {
+		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "User.active"`)}
+	}
+	if _, ok := uc.mutation.Deleted(); !ok {
+		return &ValidationError{Name: "deleted", err: errors.New(`ent: missing required field "User.deleted"`)}
 	}
 	if v, ok := uc.mutation.Address(); ok {
 		if err := user.AddressValidator(v); err != nil {
@@ -300,6 +358,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldNationalCode, field.TypeString, value)
 		_node.NationalCode = value
 	}
+	if value, ok := uc.mutation.Active(); ok {
+		_spec.SetField(user.FieldActive, field.TypeBool, value)
+		_node.Active = value
+	}
+	if value, ok := uc.mutation.Deleted(); ok {
+		_spec.SetField(user.FieldDeleted, field.TypeBool, value)
+		_node.Deleted = value
+	}
 	if value, ok := uc.mutation.Address(); ok {
 		_spec.SetField(user.FieldAddress, field.TypeString, value)
 		_node.Address = &value
@@ -337,6 +403,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(mainiot.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.UserpaymentplansIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserpaymentplansTable,
+			Columns: []string{user.UserpaymentplansColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userpaymentplan.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

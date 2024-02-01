@@ -90,6 +90,16 @@ func IPRemote(v string) predicate.MainIot {
 	return predicate.MainIot(sql.FieldEQ(FieldIPRemote, v))
 }
 
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v string) predicate.MainIot {
+	return predicate.MainIot(sql.FieldEQ(FieldStatus, v))
+}
+
+// Active applies equality check predicate on the "active" field. It's identical to ActiveEQ.
+func Active(v bool) predicate.MainIot {
+	return predicate.MainIot(sql.FieldEQ(FieldActive, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.MainIot {
 	return predicate.MainIot(sql.FieldEQ(FieldCreatedAt, v))
@@ -565,6 +575,91 @@ func IPRemoteContainsFold(v string) predicate.MainIot {
 	return predicate.MainIot(sql.FieldContainsFold(FieldIPRemote, v))
 }
 
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v string) predicate.MainIot {
+	return predicate.MainIot(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v string) predicate.MainIot {
+	return predicate.MainIot(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...string) predicate.MainIot {
+	return predicate.MainIot(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...string) predicate.MainIot {
+	return predicate.MainIot(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v string) predicate.MainIot {
+	return predicate.MainIot(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v string) predicate.MainIot {
+	return predicate.MainIot(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v string) predicate.MainIot {
+	return predicate.MainIot(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v string) predicate.MainIot {
+	return predicate.MainIot(sql.FieldLTE(FieldStatus, v))
+}
+
+// StatusContains applies the Contains predicate on the "status" field.
+func StatusContains(v string) predicate.MainIot {
+	return predicate.MainIot(sql.FieldContains(FieldStatus, v))
+}
+
+// StatusHasPrefix applies the HasPrefix predicate on the "status" field.
+func StatusHasPrefix(v string) predicate.MainIot {
+	return predicate.MainIot(sql.FieldHasPrefix(FieldStatus, v))
+}
+
+// StatusHasSuffix applies the HasSuffix predicate on the "status" field.
+func StatusHasSuffix(v string) predicate.MainIot {
+	return predicate.MainIot(sql.FieldHasSuffix(FieldStatus, v))
+}
+
+// StatusIsNil applies the IsNil predicate on the "status" field.
+func StatusIsNil() predicate.MainIot {
+	return predicate.MainIot(sql.FieldIsNull(FieldStatus))
+}
+
+// StatusNotNil applies the NotNil predicate on the "status" field.
+func StatusNotNil() predicate.MainIot {
+	return predicate.MainIot(sql.FieldNotNull(FieldStatus))
+}
+
+// StatusEqualFold applies the EqualFold predicate on the "status" field.
+func StatusEqualFold(v string) predicate.MainIot {
+	return predicate.MainIot(sql.FieldEqualFold(FieldStatus, v))
+}
+
+// StatusContainsFold applies the ContainsFold predicate on the "status" field.
+func StatusContainsFold(v string) predicate.MainIot {
+	return predicate.MainIot(sql.FieldContainsFold(FieldStatus, v))
+}
+
+// ActiveEQ applies the EQ predicate on the "active" field.
+func ActiveEQ(v bool) predicate.MainIot {
+	return predicate.MainIot(sql.FieldEQ(FieldActive, v))
+}
+
+// ActiveNEQ applies the NEQ predicate on the "active" field.
+func ActiveNEQ(v bool) predicate.MainIot {
+	return predicate.MainIot(sql.FieldNEQ(FieldActive, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.MainIot {
 	return predicate.MainIot(sql.FieldEQ(FieldCreatedAt, v))
@@ -668,21 +763,21 @@ func HasDeviceiotsWith(preds ...predicate.DeviceIot) predicate.MainIot {
 	})
 }
 
-// HasOwner applies the HasEdge predicate on the "owner" edge.
-func HasOwner() predicate.MainIot {
+// HasUserID applies the HasEdge predicate on the "user_id" edge.
+func HasUserID() predicate.MainIot {
 	return predicate.MainIot(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, UserIDTable, UserIDColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasOwnerWith applies the HasEdge predicate on the "owner" edge with a given conditions (other predicates).
-func HasOwnerWith(preds ...predicate.User) predicate.MainIot {
+// HasUserIDWith applies the HasEdge predicate on the "user_id" edge with a given conditions (other predicates).
+func HasUserIDWith(preds ...predicate.User) predicate.MainIot {
 	return predicate.MainIot(func(s *sql.Selector) {
-		step := newOwnerStep()
+		step := newUserIDStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

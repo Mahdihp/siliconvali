@@ -23,6 +23,9 @@ func (User) Fields() []ent.Field {
 		field.String("lastname").MaxLen(100).Optional().Nillable(),
 		field.String("mobile").MaxLen(11).Optional(),
 		field.String("national_code").MaxLen(10).Optional(),
+		field.Bool("active").Default(true).Comment("فعال بودن"),
+		field.Bool("deleted").Default(false).Comment("حذف منطقی"),
+
 		field.String("address").Optional().
 			SchemaType(map[string]string{
 				dialect.Postgres: "text", // Override Postgres.
@@ -42,8 +45,7 @@ func (User) Fields() []ent.Field {
 
 func (User) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("id").
-			Unique(),
+		index.Fields("id").Unique(),
 	}
 }
 
@@ -51,6 +53,9 @@ func (User) Indexes() []ent.Index {
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("roles", Role.Type).Ref("users"),
+
 		edge.To("mainiots", MainIot.Type),
+
+		edge.To("userpaymentplans", UserPaymentPlan.Type),
 	}
 }

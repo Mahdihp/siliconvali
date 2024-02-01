@@ -24,6 +24,10 @@ const (
 	FieldMobile = "mobile"
 	// FieldNationalCode holds the string denoting the national_code field in the database.
 	FieldNationalCode = "national_code"
+	// FieldActive holds the string denoting the active field in the database.
+	FieldActive = "active"
+	// FieldDeleted holds the string denoting the deleted field in the database.
+	FieldDeleted = "deleted"
 	// FieldAddress holds the string denoting the address field in the database.
 	FieldAddress = "address"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -34,6 +38,8 @@ const (
 	EdgeRoles = "roles"
 	// EdgeMainiots holds the string denoting the mainiots edge name in mutations.
 	EdgeMainiots = "mainiots"
+	// EdgeUserpaymentplans holds the string denoting the userpaymentplans edge name in mutations.
+	EdgeUserpaymentplans = "userpaymentplans"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// RolesTable is the table that holds the roles relation/edge. The primary key declared below.
@@ -48,6 +54,13 @@ const (
 	MainiotsInverseTable = "main_iots"
 	// MainiotsColumn is the table column denoting the mainiots relation/edge.
 	MainiotsColumn = "user_mainiots"
+	// UserpaymentplansTable is the table that holds the userpaymentplans relation/edge.
+	UserpaymentplansTable = "user_payment_plans"
+	// UserpaymentplansInverseTable is the table name for the UserPaymentPlan entity.
+	// It exists in this package in order to avoid circular dependency with the "userpaymentplan" package.
+	UserpaymentplansInverseTable = "user_payment_plans"
+	// UserpaymentplansColumn is the table column denoting the userpaymentplans relation/edge.
+	UserpaymentplansColumn = "user_userpaymentplans"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -58,6 +71,8 @@ var Columns = []string{
 	FieldLastname,
 	FieldMobile,
 	FieldNationalCode,
+	FieldActive,
+	FieldDeleted,
 	FieldAddress,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -90,6 +105,10 @@ var (
 	MobileValidator func(string) error
 	// NationalCodeValidator is a validator for the "national_code" field. It is called by the builders before save.
 	NationalCodeValidator func(string) error
+	// DefaultActive holds the default value on creation for the "active" field.
+	DefaultActive bool
+	// DefaultDeleted holds the default value on creation for the "deleted" field.
+	DefaultDeleted bool
 	// AddressValidator is a validator for the "address" field. It is called by the builders before save.
 	AddressValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -129,6 +148,16 @@ func ByMobile(opts ...sql.OrderTermOption) OrderOption {
 // ByNationalCode orders the results by the national_code field.
 func ByNationalCode(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldNationalCode, opts...).ToFunc()
+}
+
+// ByActive orders the results by the active field.
+func ByActive(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldActive, opts...).ToFunc()
+}
+
+// ByDeleted orders the results by the deleted field.
+func ByDeleted(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeleted, opts...).ToFunc()
 }
 
 // ByAddress orders the results by the address field.
@@ -173,6 +202,20 @@ func ByMainiots(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newMainiotsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByUserpaymentplansCount orders the results by userpaymentplans count.
+func ByUserpaymentplansCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserpaymentplansStep(), opts...)
+	}
+}
+
+// ByUserpaymentplans orders the results by userpaymentplans terms.
+func ByUserpaymentplans(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserpaymentplansStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newRolesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -185,5 +228,12 @@ func newMainiotsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MainiotsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, MainiotsTable, MainiotsColumn),
+	)
+}
+func newUserpaymentplansStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserpaymentplansInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, UserpaymentplansTable, UserpaymentplansColumn),
 	)
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql"
 	"fmt"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
@@ -11,7 +10,6 @@ import (
 	_ "github.com/lib/pq"
 	"siliconvali/config"
 	"siliconvali/ent"
-	"siliconvali/ent/role"
 )
 
 var AppConfig config.AppConfiguration
@@ -21,6 +19,13 @@ func init() {
 	//fmt.Println(AppConfig)
 }
 func main() {
+
+	InitAndSeedData()
+
+	//StartServer()
+}
+
+func InitAndSeedData() {
 
 	//ConnetionString := "postgres://postgres:postgres@localhost:5432/postgres"
 	ConnetionString := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
@@ -44,23 +49,22 @@ func main() {
 	//fmt.Println("Role Error", errSql)
 	//fmt.Println("Role Result", newRole)
 
-	roleFund, err := client.Role.Query().Where(sql.FieldEQ(role.FieldID, 2)).First(ctx)
-
-	a8m, errSql := client.User.Create().
-		SetUsername("mahdi3").
-		SetFirstname("Mahdi").
-		SetLastname("Hosseinpour").
-		SetMobile("09339466051").
-		//AddRoleIDs(newRole.ID).
-		AddRoles(roleFund).
-		Save(ctx)
-
-	fmt.Println("Role Found", roleFund)
-	fmt.Println("User Error", errSql)
-	fmt.Println("User Result", a8m)
-
-	defer client.Close()
-	//StartServer()
+	//roleFund, err := client.Role.Query().Where(sql.FieldEQ(role.FieldID, 2)).First(ctx)
+	//
+	//a8m, errSql := client.User.Create().
+	//	SetUsername("mahdi3").
+	//	SetFirstname("Mahdi").
+	//	SetLastname("Hosseinpour").
+	//	SetMobile("09339466051").
+	//	//AddRoleIDs(newRole.ID).
+	//	AddRoles(roleFund).
+	//	Save(ctx)
+	//
+	//fmt.Println("Role Found", roleFund)
+	//fmt.Println("User Error", errSql)
+	//fmt.Println("User Result", a8m)
+	//
+	//defer client.Close()
 }
 
 func StartServer() {

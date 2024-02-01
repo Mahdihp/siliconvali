@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"siliconvali/ent/devicedetails"
 	"siliconvali/ent/deviceiot"
 	"siliconvali/ent/mainiot"
 	"time"
@@ -55,6 +56,62 @@ func (dic *DeviceIotCreate) SetNillableTypeDevice(i *int) *DeviceIotCreate {
 	return dic
 }
 
+// SetStatus sets the "status" field.
+func (dic *DeviceIotCreate) SetStatus(s string) *DeviceIotCreate {
+	dic.mutation.SetStatus(s)
+	return dic
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (dic *DeviceIotCreate) SetNillableStatus(s *string) *DeviceIotCreate {
+	if s != nil {
+		dic.SetStatus(*s)
+	}
+	return dic
+}
+
+// SetActive sets the "active" field.
+func (dic *DeviceIotCreate) SetActive(b bool) *DeviceIotCreate {
+	dic.mutation.SetActive(b)
+	return dic
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (dic *DeviceIotCreate) SetNillableActive(b *bool) *DeviceIotCreate {
+	if b != nil {
+		dic.SetActive(*b)
+	}
+	return dic
+}
+
+// SetLat sets the "lat" field.
+func (dic *DeviceIotCreate) SetLat(f float64) *DeviceIotCreate {
+	dic.mutation.SetLat(f)
+	return dic
+}
+
+// SetNillableLat sets the "lat" field if the given value is not nil.
+func (dic *DeviceIotCreate) SetNillableLat(f *float64) *DeviceIotCreate {
+	if f != nil {
+		dic.SetLat(*f)
+	}
+	return dic
+}
+
+// SetLon sets the "lon" field.
+func (dic *DeviceIotCreate) SetLon(f float64) *DeviceIotCreate {
+	dic.mutation.SetLon(f)
+	return dic
+}
+
+// SetNillableLon sets the "lon" field if the given value is not nil.
+func (dic *DeviceIotCreate) SetNillableLon(f *float64) *DeviceIotCreate {
+	if f != nil {
+		dic.SetLon(*f)
+	}
+	return dic
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (dic *DeviceIotCreate) SetCreatedAt(t time.Time) *DeviceIotCreate {
 	dic.mutation.SetCreatedAt(t)
@@ -89,23 +146,38 @@ func (dic *DeviceIotCreate) SetID(i int64) *DeviceIotCreate {
 	return dic
 }
 
-// SetOwnerID sets the "owner" edge to the MainIot entity by ID.
-func (dic *DeviceIotCreate) SetOwnerID(id int64) *DeviceIotCreate {
-	dic.mutation.SetOwnerID(id)
+// SetMainiotIDID sets the "mainiot_id" edge to the MainIot entity by ID.
+func (dic *DeviceIotCreate) SetMainiotIDID(id int64) *DeviceIotCreate {
+	dic.mutation.SetMainiotIDID(id)
 	return dic
 }
 
-// SetNillableOwnerID sets the "owner" edge to the MainIot entity by ID if the given value is not nil.
-func (dic *DeviceIotCreate) SetNillableOwnerID(id *int64) *DeviceIotCreate {
+// SetNillableMainiotIDID sets the "mainiot_id" edge to the MainIot entity by ID if the given value is not nil.
+func (dic *DeviceIotCreate) SetNillableMainiotIDID(id *int64) *DeviceIotCreate {
 	if id != nil {
-		dic = dic.SetOwnerID(*id)
+		dic = dic.SetMainiotIDID(*id)
 	}
 	return dic
 }
 
-// SetOwner sets the "owner" edge to the MainIot entity.
-func (dic *DeviceIotCreate) SetOwner(m *MainIot) *DeviceIotCreate {
-	return dic.SetOwnerID(m.ID)
+// SetMainiotID sets the "mainiot_id" edge to the MainIot entity.
+func (dic *DeviceIotCreate) SetMainiotID(m *MainIot) *DeviceIotCreate {
+	return dic.SetMainiotIDID(m.ID)
+}
+
+// AddDevicedetailIDs adds the "devicedetails" edge to the DeviceDetails entity by IDs.
+func (dic *DeviceIotCreate) AddDevicedetailIDs(ids ...int) *DeviceIotCreate {
+	dic.mutation.AddDevicedetailIDs(ids...)
+	return dic
+}
+
+// AddDevicedetails adds the "devicedetails" edges to the DeviceDetails entity.
+func (dic *DeviceIotCreate) AddDevicedetails(d ...*DeviceDetails) *DeviceIotCreate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return dic.AddDevicedetailIDs(ids...)
 }
 
 // Mutation returns the DeviceIotMutation object of the builder.
@@ -143,6 +215,10 @@ func (dic *DeviceIotCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (dic *DeviceIotCreate) defaults() {
+	if _, ok := dic.mutation.Active(); !ok {
+		v := deviceiot.DefaultActive
+		dic.mutation.SetActive(v)
+	}
 	if _, ok := dic.mutation.CreatedAt(); !ok {
 		v := deviceiot.DefaultCreatedAt()
 		dic.mutation.SetCreatedAt(v)
@@ -167,6 +243,9 @@ func (dic *DeviceIotCreate) check() error {
 		if err := deviceiot.SerialNumberValidator(v); err != nil {
 			return &ValidationError{Name: "serial_number", err: fmt.Errorf(`ent: validator failed for field "DeviceIot.serial_number": %w`, err)}
 		}
+	}
+	if _, ok := dic.mutation.Active(); !ok {
+		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "DeviceIot.active"`)}
 	}
 	if _, ok := dic.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "DeviceIot.created_at"`)}
@@ -218,6 +297,22 @@ func (dic *DeviceIotCreate) createSpec() (*DeviceIot, *sqlgraph.CreateSpec) {
 		_spec.SetField(deviceiot.FieldTypeDevice, field.TypeInt, value)
 		_node.TypeDevice = &value
 	}
+	if value, ok := dic.mutation.Status(); ok {
+		_spec.SetField(deviceiot.FieldStatus, field.TypeString, value)
+		_node.Status = &value
+	}
+	if value, ok := dic.mutation.Active(); ok {
+		_spec.SetField(deviceiot.FieldActive, field.TypeBool, value)
+		_node.Active = value
+	}
+	if value, ok := dic.mutation.Lat(); ok {
+		_spec.SetField(deviceiot.FieldLat, field.TypeFloat64, value)
+		_node.Lat = &value
+	}
+	if value, ok := dic.mutation.Lon(); ok {
+		_spec.SetField(deviceiot.FieldLon, field.TypeFloat64, value)
+		_node.Lon = &value
+	}
 	if value, ok := dic.mutation.CreatedAt(); ok {
 		_spec.SetField(deviceiot.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -226,12 +321,12 @@ func (dic *DeviceIotCreate) createSpec() (*DeviceIot, *sqlgraph.CreateSpec) {
 		_spec.SetField(deviceiot.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if nodes := dic.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := dic.mutation.MainiotIDIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   deviceiot.OwnerTable,
-			Columns: []string{deviceiot.OwnerColumn},
+			Table:   deviceiot.MainiotIDTable,
+			Columns: []string{deviceiot.MainiotIDColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(mainiot.FieldID, field.TypeInt64),
@@ -241,6 +336,22 @@ func (dic *DeviceIotCreate) createSpec() (*DeviceIot, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.main_iot_deviceiots = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := dic.mutation.DevicedetailsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   deviceiot.DevicedetailsTable,
+			Columns: []string{deviceiot.DevicedetailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(devicedetails.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

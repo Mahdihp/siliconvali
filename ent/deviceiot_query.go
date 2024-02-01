@@ -4,8 +4,10 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
+	"siliconvali/ent/devicedetails"
 	"siliconvali/ent/deviceiot"
 	"siliconvali/ent/mainiot"
 	"siliconvali/ent/predicate"
@@ -18,12 +20,13 @@ import (
 // DeviceIotQuery is the builder for querying DeviceIot entities.
 type DeviceIotQuery struct {
 	config
-	ctx        *QueryContext
-	order      []deviceiot.OrderOption
-	inters     []Interceptor
-	predicates []predicate.DeviceIot
-	withOwner  *MainIotQuery
-	withFKs    bool
+	ctx               *QueryContext
+	order             []deviceiot.OrderOption
+	inters            []Interceptor
+	predicates        []predicate.DeviceIot
+	withMainiotID     *MainIotQuery
+	withDevicedetails *DeviceDetailsQuery
+	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -60,8 +63,8 @@ func (diq *DeviceIotQuery) Order(o ...deviceiot.OrderOption) *DeviceIotQuery {
 	return diq
 }
 
-// QueryOwner chains the current query on the "owner" edge.
-func (diq *DeviceIotQuery) QueryOwner() *MainIotQuery {
+// QueryMainiotID chains the current query on the "mainiot_id" edge.
+func (diq *DeviceIotQuery) QueryMainiotID() *MainIotQuery {
 	query := (&MainIotClient{config: diq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := diq.prepareQuery(ctx); err != nil {
@@ -74,7 +77,29 @@ func (diq *DeviceIotQuery) QueryOwner() *MainIotQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(deviceiot.Table, deviceiot.FieldID, selector),
 			sqlgraph.To(mainiot.Table, mainiot.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, deviceiot.OwnerTable, deviceiot.OwnerColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, deviceiot.MainiotIDTable, deviceiot.MainiotIDColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(diq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDevicedetails chains the current query on the "devicedetails" edge.
+func (diq *DeviceIotQuery) QueryDevicedetails() *DeviceDetailsQuery {
+	query := (&DeviceDetailsClient{config: diq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := diq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := diq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(deviceiot.Table, deviceiot.FieldID, selector),
+			sqlgraph.To(devicedetails.Table, devicedetails.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, deviceiot.DevicedetailsTable, deviceiot.DevicedetailsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(diq.driver.Dialect(), step)
 		return fromU, nil
@@ -269,26 +294,38 @@ func (diq *DeviceIotQuery) Clone() *DeviceIotQuery {
 		return nil
 	}
 	return &DeviceIotQuery{
-		config:     diq.config,
-		ctx:        diq.ctx.Clone(),
-		order:      append([]deviceiot.OrderOption{}, diq.order...),
-		inters:     append([]Interceptor{}, diq.inters...),
-		predicates: append([]predicate.DeviceIot{}, diq.predicates...),
-		withOwner:  diq.withOwner.Clone(),
+		config:            diq.config,
+		ctx:               diq.ctx.Clone(),
+		order:             append([]deviceiot.OrderOption{}, diq.order...),
+		inters:            append([]Interceptor{}, diq.inters...),
+		predicates:        append([]predicate.DeviceIot{}, diq.predicates...),
+		withMainiotID:     diq.withMainiotID.Clone(),
+		withDevicedetails: diq.withDevicedetails.Clone(),
 		// clone intermediate query.
 		sql:  diq.sql.Clone(),
 		path: diq.path,
 	}
 }
 
-// WithOwner tells the query-builder to eager-load the nodes that are connected to
-// the "owner" edge. The optional arguments are used to configure the query builder of the edge.
-func (diq *DeviceIotQuery) WithOwner(opts ...func(*MainIotQuery)) *DeviceIotQuery {
+// WithMainiotID tells the query-builder to eager-load the nodes that are connected to
+// the "mainiot_id" edge. The optional arguments are used to configure the query builder of the edge.
+func (diq *DeviceIotQuery) WithMainiotID(opts ...func(*MainIotQuery)) *DeviceIotQuery {
 	query := (&MainIotClient{config: diq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	diq.withOwner = query
+	diq.withMainiotID = query
+	return diq
+}
+
+// WithDevicedetails tells the query-builder to eager-load the nodes that are connected to
+// the "devicedetails" edge. The optional arguments are used to configure the query builder of the edge.
+func (diq *DeviceIotQuery) WithDevicedetails(opts ...func(*DeviceDetailsQuery)) *DeviceIotQuery {
+	query := (&DeviceDetailsClient{config: diq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	diq.withDevicedetails = query
 	return diq
 }
 
@@ -371,11 +408,12 @@ func (diq *DeviceIotQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*D
 		nodes       = []*DeviceIot{}
 		withFKs     = diq.withFKs
 		_spec       = diq.querySpec()
-		loadedTypes = [1]bool{
-			diq.withOwner != nil,
+		loadedTypes = [2]bool{
+			diq.withMainiotID != nil,
+			diq.withDevicedetails != nil,
 		}
 	)
-	if diq.withOwner != nil {
+	if diq.withMainiotID != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -399,16 +437,23 @@ func (diq *DeviceIotQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*D
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := diq.withOwner; query != nil {
-		if err := diq.loadOwner(ctx, query, nodes, nil,
-			func(n *DeviceIot, e *MainIot) { n.Edges.Owner = e }); err != nil {
+	if query := diq.withMainiotID; query != nil {
+		if err := diq.loadMainiotID(ctx, query, nodes, nil,
+			func(n *DeviceIot, e *MainIot) { n.Edges.MainiotID = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := diq.withDevicedetails; query != nil {
+		if err := diq.loadDevicedetails(ctx, query, nodes,
+			func(n *DeviceIot) { n.Edges.Devicedetails = []*DeviceDetails{} },
+			func(n *DeviceIot, e *DeviceDetails) { n.Edges.Devicedetails = append(n.Edges.Devicedetails, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (diq *DeviceIotQuery) loadOwner(ctx context.Context, query *MainIotQuery, nodes []*DeviceIot, init func(*DeviceIot), assign func(*DeviceIot, *MainIot)) error {
+func (diq *DeviceIotQuery) loadMainiotID(ctx context.Context, query *MainIotQuery, nodes []*DeviceIot, init func(*DeviceIot), assign func(*DeviceIot, *MainIot)) error {
 	ids := make([]int64, 0, len(nodes))
 	nodeids := make(map[int64][]*DeviceIot)
 	for i := range nodes {
@@ -437,6 +482,37 @@ func (diq *DeviceIotQuery) loadOwner(ctx context.Context, query *MainIotQuery, n
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (diq *DeviceIotQuery) loadDevicedetails(ctx context.Context, query *DeviceDetailsQuery, nodes []*DeviceIot, init func(*DeviceIot), assign func(*DeviceIot, *DeviceDetails)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int64]*DeviceIot)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.DeviceDetails(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(deviceiot.DevicedetailsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.device_iot_devicedetails
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "device_iot_devicedetails" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "device_iot_devicedetails" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

@@ -80,6 +80,16 @@ func NationalCode(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldNationalCode, v))
 }
 
+// Active applies equality check predicate on the "active" field. It's identical to ActiveEQ.
+func Active(v bool) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldActive, v))
+}
+
+// Deleted applies equality check predicate on the "deleted" field. It's identical to DeletedEQ.
+func Deleted(v bool) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldDeleted, v))
+}
+
 // Address applies equality check predicate on the "address" field. It's identical to AddressEQ.
 func Address(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldAddress, v))
@@ -460,6 +470,26 @@ func NationalCodeContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldNationalCode, v))
 }
 
+// ActiveEQ applies the EQ predicate on the "active" field.
+func ActiveEQ(v bool) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldActive, v))
+}
+
+// ActiveNEQ applies the NEQ predicate on the "active" field.
+func ActiveNEQ(v bool) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldActive, v))
+}
+
+// DeletedEQ applies the EQ predicate on the "deleted" field.
+func DeletedEQ(v bool) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldDeleted, v))
+}
+
+// DeletedNEQ applies the NEQ predicate on the "deleted" field.
+func DeletedNEQ(v bool) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldDeleted, v))
+}
+
 // AddressEQ applies the EQ predicate on the "address" field.
 func AddressEQ(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldAddress, v))
@@ -653,6 +683,29 @@ func HasMainiots() predicate.User {
 func HasMainiotsWith(preds ...predicate.MainIot) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := newMainiotsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasUserpaymentplans applies the HasEdge predicate on the "userpaymentplans" edge.
+func HasUserpaymentplans() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, UserpaymentplansTable, UserpaymentplansColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserpaymentplansWith applies the HasEdge predicate on the "userpaymentplans" edge with a given conditions (other predicates).
+func HasUserpaymentplansWith(preds ...predicate.UserPaymentPlan) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newUserpaymentplansStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

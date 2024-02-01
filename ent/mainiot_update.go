@@ -178,6 +178,40 @@ func (miu *MainIotUpdate) ClearIPRemote() *MainIotUpdate {
 	return miu
 }
 
+// SetStatus sets the "status" field.
+func (miu *MainIotUpdate) SetStatus(s string) *MainIotUpdate {
+	miu.mutation.SetStatus(s)
+	return miu
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (miu *MainIotUpdate) SetNillableStatus(s *string) *MainIotUpdate {
+	if s != nil {
+		miu.SetStatus(*s)
+	}
+	return miu
+}
+
+// ClearStatus clears the value of the "status" field.
+func (miu *MainIotUpdate) ClearStatus() *MainIotUpdate {
+	miu.mutation.ClearStatus()
+	return miu
+}
+
+// SetActive sets the "active" field.
+func (miu *MainIotUpdate) SetActive(b bool) *MainIotUpdate {
+	miu.mutation.SetActive(b)
+	return miu
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (miu *MainIotUpdate) SetNillableActive(b *bool) *MainIotUpdate {
+	if b != nil {
+		miu.SetActive(*b)
+	}
+	return miu
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (miu *MainIotUpdate) SetUpdatedAt(t time.Time) *MainIotUpdate {
 	miu.mutation.SetUpdatedAt(t)
@@ -207,23 +241,15 @@ func (miu *MainIotUpdate) AddDeviceiots(d ...*DeviceIot) *MainIotUpdate {
 	return miu.AddDeviceiotIDs(ids...)
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (miu *MainIotUpdate) SetOwnerID(id int64) *MainIotUpdate {
-	miu.mutation.SetOwnerID(id)
+// SetUserIDID sets the "user_id" edge to the User entity by ID.
+func (miu *MainIotUpdate) SetUserIDID(id int64) *MainIotUpdate {
+	miu.mutation.SetUserIDID(id)
 	return miu
 }
 
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
-func (miu *MainIotUpdate) SetNillableOwnerID(id *int64) *MainIotUpdate {
-	if id != nil {
-		miu = miu.SetOwnerID(*id)
-	}
-	return miu
-}
-
-// SetOwner sets the "owner" edge to the User entity.
-func (miu *MainIotUpdate) SetOwner(u *User) *MainIotUpdate {
-	return miu.SetOwnerID(u.ID)
+// SetUserID sets the "user_id" edge to the User entity.
+func (miu *MainIotUpdate) SetUserID(u *User) *MainIotUpdate {
+	return miu.SetUserIDID(u.ID)
 }
 
 // Mutation returns the MainIotMutation object of the builder.
@@ -252,9 +278,9 @@ func (miu *MainIotUpdate) RemoveDeviceiots(d ...*DeviceIot) *MainIotUpdate {
 	return miu.RemoveDeviceiotIDs(ids...)
 }
 
-// ClearOwner clears the "owner" edge to the User entity.
-func (miu *MainIotUpdate) ClearOwner() *MainIotUpdate {
-	miu.mutation.ClearOwner()
+// ClearUserID clears the "user_id" edge to the User entity.
+func (miu *MainIotUpdate) ClearUserID() *MainIotUpdate {
+	miu.mutation.ClearUserID()
 	return miu
 }
 
@@ -311,6 +337,9 @@ func (miu *MainIotUpdate) check() error {
 		if err := mainiot.IPRemoteValidator(v); err != nil {
 			return &ValidationError{Name: "ip_remote", err: fmt.Errorf(`ent: validator failed for field "MainIot.ip_remote": %w`, err)}
 		}
+	}
+	if _, ok := miu.mutation.UserIDID(); miu.mutation.UserIDCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "MainIot.user_id"`)
 	}
 	return nil
 }
@@ -372,6 +401,15 @@ func (miu *MainIotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if miu.mutation.IPRemoteCleared() {
 		_spec.ClearField(mainiot.FieldIPRemote, field.TypeString)
 	}
+	if value, ok := miu.mutation.Status(); ok {
+		_spec.SetField(mainiot.FieldStatus, field.TypeString, value)
+	}
+	if miu.mutation.StatusCleared() {
+		_spec.ClearField(mainiot.FieldStatus, field.TypeString)
+	}
+	if value, ok := miu.mutation.Active(); ok {
+		_spec.SetField(mainiot.FieldActive, field.TypeBool, value)
+	}
 	if value, ok := miu.mutation.UpdatedAt(); ok {
 		_spec.SetField(mainiot.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -420,12 +458,12 @@ func (miu *MainIotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if miu.mutation.OwnerCleared() {
+	if miu.mutation.UserIDCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   mainiot.OwnerTable,
-			Columns: []string{mainiot.OwnerColumn},
+			Table:   mainiot.UserIDTable,
+			Columns: []string{mainiot.UserIDColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),
@@ -433,12 +471,12 @@ func (miu *MainIotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := miu.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := miu.mutation.UserIDIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   mainiot.OwnerTable,
-			Columns: []string{mainiot.OwnerColumn},
+			Table:   mainiot.UserIDTable,
+			Columns: []string{mainiot.UserIDColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),
@@ -617,6 +655,40 @@ func (miuo *MainIotUpdateOne) ClearIPRemote() *MainIotUpdateOne {
 	return miuo
 }
 
+// SetStatus sets the "status" field.
+func (miuo *MainIotUpdateOne) SetStatus(s string) *MainIotUpdateOne {
+	miuo.mutation.SetStatus(s)
+	return miuo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (miuo *MainIotUpdateOne) SetNillableStatus(s *string) *MainIotUpdateOne {
+	if s != nil {
+		miuo.SetStatus(*s)
+	}
+	return miuo
+}
+
+// ClearStatus clears the value of the "status" field.
+func (miuo *MainIotUpdateOne) ClearStatus() *MainIotUpdateOne {
+	miuo.mutation.ClearStatus()
+	return miuo
+}
+
+// SetActive sets the "active" field.
+func (miuo *MainIotUpdateOne) SetActive(b bool) *MainIotUpdateOne {
+	miuo.mutation.SetActive(b)
+	return miuo
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (miuo *MainIotUpdateOne) SetNillableActive(b *bool) *MainIotUpdateOne {
+	if b != nil {
+		miuo.SetActive(*b)
+	}
+	return miuo
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (miuo *MainIotUpdateOne) SetUpdatedAt(t time.Time) *MainIotUpdateOne {
 	miuo.mutation.SetUpdatedAt(t)
@@ -646,23 +718,15 @@ func (miuo *MainIotUpdateOne) AddDeviceiots(d ...*DeviceIot) *MainIotUpdateOne {
 	return miuo.AddDeviceiotIDs(ids...)
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (miuo *MainIotUpdateOne) SetOwnerID(id int64) *MainIotUpdateOne {
-	miuo.mutation.SetOwnerID(id)
+// SetUserIDID sets the "user_id" edge to the User entity by ID.
+func (miuo *MainIotUpdateOne) SetUserIDID(id int64) *MainIotUpdateOne {
+	miuo.mutation.SetUserIDID(id)
 	return miuo
 }
 
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
-func (miuo *MainIotUpdateOne) SetNillableOwnerID(id *int64) *MainIotUpdateOne {
-	if id != nil {
-		miuo = miuo.SetOwnerID(*id)
-	}
-	return miuo
-}
-
-// SetOwner sets the "owner" edge to the User entity.
-func (miuo *MainIotUpdateOne) SetOwner(u *User) *MainIotUpdateOne {
-	return miuo.SetOwnerID(u.ID)
+// SetUserID sets the "user_id" edge to the User entity.
+func (miuo *MainIotUpdateOne) SetUserID(u *User) *MainIotUpdateOne {
+	return miuo.SetUserIDID(u.ID)
 }
 
 // Mutation returns the MainIotMutation object of the builder.
@@ -691,9 +755,9 @@ func (miuo *MainIotUpdateOne) RemoveDeviceiots(d ...*DeviceIot) *MainIotUpdateOn
 	return miuo.RemoveDeviceiotIDs(ids...)
 }
 
-// ClearOwner clears the "owner" edge to the User entity.
-func (miuo *MainIotUpdateOne) ClearOwner() *MainIotUpdateOne {
-	miuo.mutation.ClearOwner()
+// ClearUserID clears the "user_id" edge to the User entity.
+func (miuo *MainIotUpdateOne) ClearUserID() *MainIotUpdateOne {
+	miuo.mutation.ClearUserID()
 	return miuo
 }
 
@@ -763,6 +827,9 @@ func (miuo *MainIotUpdateOne) check() error {
 		if err := mainiot.IPRemoteValidator(v); err != nil {
 			return &ValidationError{Name: "ip_remote", err: fmt.Errorf(`ent: validator failed for field "MainIot.ip_remote": %w`, err)}
 		}
+	}
+	if _, ok := miuo.mutation.UserIDID(); miuo.mutation.UserIDCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "MainIot.user_id"`)
 	}
 	return nil
 }
@@ -841,6 +908,15 @@ func (miuo *MainIotUpdateOne) sqlSave(ctx context.Context) (_node *MainIot, err 
 	if miuo.mutation.IPRemoteCleared() {
 		_spec.ClearField(mainiot.FieldIPRemote, field.TypeString)
 	}
+	if value, ok := miuo.mutation.Status(); ok {
+		_spec.SetField(mainiot.FieldStatus, field.TypeString, value)
+	}
+	if miuo.mutation.StatusCleared() {
+		_spec.ClearField(mainiot.FieldStatus, field.TypeString)
+	}
+	if value, ok := miuo.mutation.Active(); ok {
+		_spec.SetField(mainiot.FieldActive, field.TypeBool, value)
+	}
 	if value, ok := miuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(mainiot.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -889,12 +965,12 @@ func (miuo *MainIotUpdateOne) sqlSave(ctx context.Context) (_node *MainIot, err 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if miuo.mutation.OwnerCleared() {
+	if miuo.mutation.UserIDCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   mainiot.OwnerTable,
-			Columns: []string{mainiot.OwnerColumn},
+			Table:   mainiot.UserIDTable,
+			Columns: []string{mainiot.UserIDColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),
@@ -902,12 +978,12 @@ func (miuo *MainIotUpdateOne) sqlSave(ctx context.Context) (_node *MainIot, err 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := miuo.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := miuo.mutation.UserIDIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   mainiot.OwnerTable,
-			Columns: []string{mainiot.OwnerColumn},
+			Table:   mainiot.UserIDTable,
+			Columns: []string{mainiot.UserIDColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),

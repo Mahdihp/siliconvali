@@ -11,6 +11,7 @@ import (
 	"siliconvali/ent/predicate"
 	"siliconvali/ent/role"
 	"siliconvali/ent/user"
+	"siliconvali/ent/userpaymentplan"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -20,12 +21,13 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx          *QueryContext
-	order        []user.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.User
-	withRoles    *RoleQuery
-	withMainiots *MainIotQuery
+	ctx                  *QueryContext
+	order                []user.OrderOption
+	inters               []Interceptor
+	predicates           []predicate.User
+	withRoles            *RoleQuery
+	withMainiots         *MainIotQuery
+	withUserpaymentplans *UserPaymentPlanQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -99,6 +101,28 @@ func (uq *UserQuery) QueryMainiots() *MainIotQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(mainiot.Table, mainiot.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.MainiotsTable, user.MainiotsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUserpaymentplans chains the current query on the "userpaymentplans" edge.
+func (uq *UserQuery) QueryUserpaymentplans() *UserPaymentPlanQuery {
+	query := (&UserPaymentPlanClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(userpaymentplan.Table, userpaymentplan.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.UserpaymentplansTable, user.UserpaymentplansColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -293,13 +317,14 @@ func (uq *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:       uq.config,
-		ctx:          uq.ctx.Clone(),
-		order:        append([]user.OrderOption{}, uq.order...),
-		inters:       append([]Interceptor{}, uq.inters...),
-		predicates:   append([]predicate.User{}, uq.predicates...),
-		withRoles:    uq.withRoles.Clone(),
-		withMainiots: uq.withMainiots.Clone(),
+		config:               uq.config,
+		ctx:                  uq.ctx.Clone(),
+		order:                append([]user.OrderOption{}, uq.order...),
+		inters:               append([]Interceptor{}, uq.inters...),
+		predicates:           append([]predicate.User{}, uq.predicates...),
+		withRoles:            uq.withRoles.Clone(),
+		withMainiots:         uq.withMainiots.Clone(),
+		withUserpaymentplans: uq.withUserpaymentplans.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -325,6 +350,17 @@ func (uq *UserQuery) WithMainiots(opts ...func(*MainIotQuery)) *UserQuery {
 		opt(query)
 	}
 	uq.withMainiots = query
+	return uq
+}
+
+// WithUserpaymentplans tells the query-builder to eager-load the nodes that are connected to
+// the "userpaymentplans" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithUserpaymentplans(opts ...func(*UserPaymentPlanQuery)) *UserQuery {
+	query := (&UserPaymentPlanClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withUserpaymentplans = query
 	return uq
 }
 
@@ -406,9 +442,10 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			uq.withRoles != nil,
 			uq.withMainiots != nil,
+			uq.withUserpaymentplans != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -440,6 +477,13 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadMainiots(ctx, query, nodes,
 			func(n *User) { n.Edges.Mainiots = []*MainIot{} },
 			func(n *User, e *MainIot) { n.Edges.Mainiots = append(n.Edges.Mainiots, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withUserpaymentplans; query != nil {
+		if err := uq.loadUserpaymentplans(ctx, query, nodes,
+			func(n *User) { n.Edges.Userpaymentplans = []*UserPaymentPlan{} },
+			func(n *User, e *UserPaymentPlan) { n.Edges.Userpaymentplans = append(n.Edges.Userpaymentplans, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -533,6 +577,37 @@ func (uq *UserQuery) loadMainiots(ctx context.Context, query *MainIotQuery, node
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "user_mainiots" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (uq *UserQuery) loadUserpaymentplans(ctx context.Context, query *UserPaymentPlanQuery, nodes []*User, init func(*User), assign func(*User, *UserPaymentPlan)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int64]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.UserPaymentPlan(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.UserpaymentplansColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.user_userpaymentplans
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "user_userpaymentplans" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "user_userpaymentplans" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

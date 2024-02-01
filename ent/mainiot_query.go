@@ -25,7 +25,7 @@ type MainIotQuery struct {
 	inters         []Interceptor
 	predicates     []predicate.MainIot
 	withDeviceiots *DeviceIotQuery
-	withOwner      *UserQuery
+	withUserID     *UserQuery
 	withFKs        bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -85,8 +85,8 @@ func (miq *MainIotQuery) QueryDeviceiots() *DeviceIotQuery {
 	return query
 }
 
-// QueryOwner chains the current query on the "owner" edge.
-func (miq *MainIotQuery) QueryOwner() *UserQuery {
+// QueryUserID chains the current query on the "user_id" edge.
+func (miq *MainIotQuery) QueryUserID() *UserQuery {
 	query := (&UserClient{config: miq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := miq.prepareQuery(ctx); err != nil {
@@ -99,7 +99,7 @@ func (miq *MainIotQuery) QueryOwner() *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(mainiot.Table, mainiot.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, mainiot.OwnerTable, mainiot.OwnerColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, mainiot.UserIDTable, mainiot.UserIDColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(miq.driver.Dialect(), step)
 		return fromU, nil
@@ -300,7 +300,7 @@ func (miq *MainIotQuery) Clone() *MainIotQuery {
 		inters:         append([]Interceptor{}, miq.inters...),
 		predicates:     append([]predicate.MainIot{}, miq.predicates...),
 		withDeviceiots: miq.withDeviceiots.Clone(),
-		withOwner:      miq.withOwner.Clone(),
+		withUserID:     miq.withUserID.Clone(),
 		// clone intermediate query.
 		sql:  miq.sql.Clone(),
 		path: miq.path,
@@ -318,14 +318,14 @@ func (miq *MainIotQuery) WithDeviceiots(opts ...func(*DeviceIotQuery)) *MainIotQ
 	return miq
 }
 
-// WithOwner tells the query-builder to eager-load the nodes that are connected to
-// the "owner" edge. The optional arguments are used to configure the query builder of the edge.
-func (miq *MainIotQuery) WithOwner(opts ...func(*UserQuery)) *MainIotQuery {
+// WithUserID tells the query-builder to eager-load the nodes that are connected to
+// the "user_id" edge. The optional arguments are used to configure the query builder of the edge.
+func (miq *MainIotQuery) WithUserID(opts ...func(*UserQuery)) *MainIotQuery {
 	query := (&UserClient{config: miq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	miq.withOwner = query
+	miq.withUserID = query
 	return miq
 }
 
@@ -410,10 +410,10 @@ func (miq *MainIotQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Mai
 		_spec       = miq.querySpec()
 		loadedTypes = [2]bool{
 			miq.withDeviceiots != nil,
-			miq.withOwner != nil,
+			miq.withUserID != nil,
 		}
 	)
-	if miq.withOwner != nil {
+	if miq.withUserID != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -444,9 +444,9 @@ func (miq *MainIotQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Mai
 			return nil, err
 		}
 	}
-	if query := miq.withOwner; query != nil {
-		if err := miq.loadOwner(ctx, query, nodes, nil,
-			func(n *MainIot, e *User) { n.Edges.Owner = e }); err != nil {
+	if query := miq.withUserID; query != nil {
+		if err := miq.loadUserID(ctx, query, nodes, nil,
+			func(n *MainIot, e *User) { n.Edges.UserID = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -484,7 +484,7 @@ func (miq *MainIotQuery) loadDeviceiots(ctx context.Context, query *DeviceIotQue
 	}
 	return nil
 }
-func (miq *MainIotQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []*MainIot, init func(*MainIot), assign func(*MainIot, *User)) error {
+func (miq *MainIotQuery) loadUserID(ctx context.Context, query *UserQuery, nodes []*MainIot, init func(*MainIot), assign func(*MainIot, *User)) error {
 	ids := make([]int64, 0, len(nodes))
 	nodeids := make(map[int64][]*MainIot)
 	for i := range nodes {

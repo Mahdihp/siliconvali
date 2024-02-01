@@ -8,12 +8,36 @@ import (
 )
 
 var (
+	// DeviceDetailsColumns holds the columns for the "device_details" table.
+	DeviceDetailsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "light_status", Type: field.TypeBool, Nullable: true},
+		{Name: "device_iot_devicedetails", Type: field.TypeInt64, Nullable: true},
+	}
+	// DeviceDetailsTable holds the schema information for the "device_details" table.
+	DeviceDetailsTable = &schema.Table{
+		Name:       "device_details",
+		Columns:    DeviceDetailsColumns,
+		PrimaryKey: []*schema.Column{DeviceDetailsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "device_details_device_iots_devicedetails",
+				Columns:    []*schema.Column{DeviceDetailsColumns[2]},
+				RefColumns: []*schema.Column{DeviceIotsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// DeviceIotsColumns holds the columns for the "device_iots" table.
 	DeviceIotsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "display_name", Type: field.TypeString, Size: 50},
 		{Name: "serial_number", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "type_device", Type: field.TypeInt, Nullable: true},
+		{Name: "status", Type: field.TypeString, Nullable: true},
+		{Name: "active", Type: field.TypeBool, Default: true},
+		{Name: "lat", Type: field.TypeFloat64, Nullable: true, SchemaType: map[string]string{"postgres": "point"}},
+		{Name: "lon", Type: field.TypeFloat64, Nullable: true, SchemaType: map[string]string{"postgres": "point"}},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp(6)"}},
 		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp(6)"}},
 		{Name: "main_iot_deviceiots", Type: field.TypeInt64, Nullable: true},
@@ -26,7 +50,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "device_iots_main_iots_deviceiots",
-				Columns:    []*schema.Column{DeviceIotsColumns[6]},
+				Columns:    []*schema.Column{DeviceIotsColumns[10]},
 				RefColumns: []*schema.Column{MainIotsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -42,9 +66,11 @@ var (
 		{Name: "serial_number", Type: field.TypeString, Nullable: true, Size: 15},
 		{Name: "mac_address", Type: field.TypeString, Nullable: true, Size: 15},
 		{Name: "ip_remote", Type: field.TypeString, Nullable: true, Size: 40},
+		{Name: "status", Type: field.TypeString, Nullable: true},
+		{Name: "active", Type: field.TypeBool, Default: true},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp(6)"}},
 		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp(6)"}},
-		{Name: "user_mainiots", Type: field.TypeInt64, Nullable: true},
+		{Name: "user_mainiots", Type: field.TypeInt64},
 	}
 	// MainIotsTable holds the schema information for the "main_iots" table.
 	MainIotsTable = &schema.Table{
@@ -54,11 +80,36 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "main_iots_users_mainiots",
-				Columns:    []*schema.Column{MainIotsColumns[10]},
+				Columns:    []*schema.Column{MainIotsColumns[12]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
+	}
+	// PaymentsColumns holds the columns for the "payments" table.
+	PaymentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+	}
+	// PaymentsTable holds the schema information for the "payments" table.
+	PaymentsTable = &schema.Table{
+		Name:       "payments",
+		Columns:    PaymentsColumns,
+		PrimaryKey: []*schema.Column{PaymentsColumns[0]},
+	}
+	// PlansColumns holds the columns for the "plans" table.
+	PlansColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString, Unique: true, Size: 50},
+		{Name: "price", Type: field.TypeInt64, Nullable: true},
+		{Name: "period", Type: field.TypeInt, Nullable: true},
+		{Name: "active", Type: field.TypeBool, Default: true},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 500, SchemaType: map[string]string{"postgres": "text"}},
+	}
+	// PlansTable holds the schema information for the "plans" table.
+	PlansTable = &schema.Table{
+		Name:       "plans",
+		Columns:    PlansColumns,
+		PrimaryKey: []*schema.Column{PlansColumns[0]},
 	}
 	// RolesColumns holds the columns for the "roles" table.
 	RolesColumns = []*schema.Column{
@@ -87,6 +138,8 @@ var (
 		{Name: "lastname", Type: field.TypeString, Nullable: true, Size: 100},
 		{Name: "mobile", Type: field.TypeString, Nullable: true, Size: 11},
 		{Name: "national_code", Type: field.TypeString, Nullable: true, Size: 10},
+		{Name: "active", Type: field.TypeBool, Default: true},
+		{Name: "deleted", Type: field.TypeBool, Default: false},
 		{Name: "address", Type: field.TypeString, Nullable: true, Size: 500, SchemaType: map[string]string{"postgres": "text"}},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp(6)"}},
 		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp(6)"}},
@@ -101,6 +154,39 @@ var (
 				Name:    "user_id",
 				Unique:  true,
 				Columns: []*schema.Column{UsersColumns[0]},
+			},
+		},
+	}
+	// UserPaymentPlansColumns holds the columns for the "user_payment_plans" table.
+	UserPaymentPlansColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "amount", Type: field.TypeInt64, Nullable: true},
+		{Name: "reference_number", Type: field.TypeString},
+		{Name: "transaction_number", Type: field.TypeString, Nullable: true},
+		{Name: "source_account_number", Type: field.TypeString, Nullable: true},
+		{Name: "destination_account_number", Type: field.TypeString, Nullable: true},
+		{Name: "deleted", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp(6)"}},
+		{Name: "plan_userpaymentplans", Type: field.TypeInt},
+		{Name: "user_userpaymentplans", Type: field.TypeInt64},
+	}
+	// UserPaymentPlansTable holds the schema information for the "user_payment_plans" table.
+	UserPaymentPlansTable = &schema.Table{
+		Name:       "user_payment_plans",
+		Columns:    UserPaymentPlansColumns,
+		PrimaryKey: []*schema.Column{UserPaymentPlansColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_payment_plans_plans_userpaymentplans",
+				Columns:    []*schema.Column{UserPaymentPlansColumns[8]},
+				RefColumns: []*schema.Column{PlansColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "user_payment_plans_users_userpaymentplans",
+				Columns:    []*schema.Column{UserPaymentPlansColumns[9]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -131,17 +217,24 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		DeviceDetailsTable,
 		DeviceIotsTable,
 		MainIotsTable,
+		PaymentsTable,
+		PlansTable,
 		RolesTable,
 		UsersTable,
+		UserPaymentPlansTable,
 		RoleUsersTable,
 	}
 )
 
 func init() {
+	DeviceDetailsTable.ForeignKeys[0].RefTable = DeviceIotsTable
 	DeviceIotsTable.ForeignKeys[0].RefTable = MainIotsTable
 	MainIotsTable.ForeignKeys[0].RefTable = UsersTable
+	UserPaymentPlansTable.ForeignKeys[0].RefTable = PlansTable
+	UserPaymentPlansTable.ForeignKeys[1].RefTable = UsersTable
 	RoleUsersTable.ForeignKeys[0].RefTable = RolesTable
 	RoleUsersTable.ForeignKeys[1].RefTable = UsersTable
 }

@@ -27,6 +27,10 @@ type User struct {
 	Mobile string `json:"mobile,omitempty"`
 	// NationalCode holds the value of the "national_code" field.
 	NationalCode string `json:"national_code,omitempty"`
+	// فعال بودن
+	Active bool `json:"active,omitempty"`
+	// حذف منطقی
+	Deleted bool `json:"deleted,omitempty"`
 	// Address holds the value of the "address" field.
 	Address *string `json:"address,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -45,9 +49,11 @@ type UserEdges struct {
 	Roles []*Role `json:"roles,omitempty"`
 	// Mainiots holds the value of the mainiots edge.
 	Mainiots []*MainIot `json:"mainiots,omitempty"`
+	// Userpaymentplans holds the value of the userpaymentplans edge.
+	Userpaymentplans []*UserPaymentPlan `json:"userpaymentplans,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // RolesOrErr returns the Roles value or an error if the edge
@@ -68,11 +74,22 @@ func (e UserEdges) MainiotsOrErr() ([]*MainIot, error) {
 	return nil, &NotLoadedError{edge: "mainiots"}
 }
 
+// UserpaymentplansOrErr returns the Userpaymentplans value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UserpaymentplansOrErr() ([]*UserPaymentPlan, error) {
+	if e.loadedTypes[2] {
+		return e.Userpaymentplans, nil
+	}
+	return nil, &NotLoadedError{edge: "userpaymentplans"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case user.FieldActive, user.FieldDeleted:
+			values[i] = new(sql.NullBool)
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
 		case user.FieldUsername, user.FieldFirstname, user.FieldLastname, user.FieldMobile, user.FieldNationalCode, user.FieldAddress:
@@ -132,6 +149,18 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.NationalCode = value.String
 			}
+		case user.FieldActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field active", values[i])
+			} else if value.Valid {
+				u.Active = value.Bool
+			}
+		case user.FieldDeleted:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted", values[i])
+			} else if value.Valid {
+				u.Deleted = value.Bool
+			}
 		case user.FieldAddress:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field address", values[i])
@@ -172,6 +201,11 @@ func (u *User) QueryRoles() *RoleQuery {
 // QueryMainiots queries the "mainiots" edge of the User entity.
 func (u *User) QueryMainiots() *MainIotQuery {
 	return NewUserClient(u.config).QueryMainiots(u)
+}
+
+// QueryUserpaymentplans queries the "userpaymentplans" edge of the User entity.
+func (u *User) QueryUserpaymentplans() *UserPaymentPlanQuery {
+	return NewUserClient(u.config).QueryUserpaymentplans(u)
 }
 
 // Update returns a builder for updating this User.
@@ -215,6 +249,12 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("national_code=")
 	builder.WriteString(u.NationalCode)
+	builder.WriteString(", ")
+	builder.WriteString("active=")
+	builder.WriteString(fmt.Sprintf("%v", u.Active))
+	builder.WriteString(", ")
+	builder.WriteString("deleted=")
+	builder.WriteString(fmt.Sprintf("%v", u.Deleted))
 	builder.WriteString(", ")
 	if v := u.Address; v != nil {
 		builder.WriteString("address=")

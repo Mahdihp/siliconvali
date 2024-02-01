@@ -112,6 +112,34 @@ func (mic *MainIotCreate) SetNillableIPRemote(s *string) *MainIotCreate {
 	return mic
 }
 
+// SetStatus sets the "status" field.
+func (mic *MainIotCreate) SetStatus(s string) *MainIotCreate {
+	mic.mutation.SetStatus(s)
+	return mic
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (mic *MainIotCreate) SetNillableStatus(s *string) *MainIotCreate {
+	if s != nil {
+		mic.SetStatus(*s)
+	}
+	return mic
+}
+
+// SetActive sets the "active" field.
+func (mic *MainIotCreate) SetActive(b bool) *MainIotCreate {
+	mic.mutation.SetActive(b)
+	return mic
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (mic *MainIotCreate) SetNillableActive(b *bool) *MainIotCreate {
+	if b != nil {
+		mic.SetActive(*b)
+	}
+	return mic
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (mic *MainIotCreate) SetCreatedAt(t time.Time) *MainIotCreate {
 	mic.mutation.SetCreatedAt(t)
@@ -161,23 +189,15 @@ func (mic *MainIotCreate) AddDeviceiots(d ...*DeviceIot) *MainIotCreate {
 	return mic.AddDeviceiotIDs(ids...)
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (mic *MainIotCreate) SetOwnerID(id int64) *MainIotCreate {
-	mic.mutation.SetOwnerID(id)
+// SetUserIDID sets the "user_id" edge to the User entity by ID.
+func (mic *MainIotCreate) SetUserIDID(id int64) *MainIotCreate {
+	mic.mutation.SetUserIDID(id)
 	return mic
 }
 
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
-func (mic *MainIotCreate) SetNillableOwnerID(id *int64) *MainIotCreate {
-	if id != nil {
-		mic = mic.SetOwnerID(*id)
-	}
-	return mic
-}
-
-// SetOwner sets the "owner" edge to the User entity.
-func (mic *MainIotCreate) SetOwner(u *User) *MainIotCreate {
-	return mic.SetOwnerID(u.ID)
+// SetUserID sets the "user_id" edge to the User entity.
+func (mic *MainIotCreate) SetUserID(u *User) *MainIotCreate {
+	return mic.SetUserIDID(u.ID)
 }
 
 // Mutation returns the MainIotMutation object of the builder.
@@ -215,6 +235,10 @@ func (mic *MainIotCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (mic *MainIotCreate) defaults() {
+	if _, ok := mic.mutation.Active(); !ok {
+		v := mainiot.DefaultActive
+		mic.mutation.SetActive(v)
+	}
 	if _, ok := mic.mutation.CreatedAt(); !ok {
 		v := mainiot.DefaultCreatedAt()
 		mic.mutation.SetCreatedAt(v)
@@ -255,11 +279,17 @@ func (mic *MainIotCreate) check() error {
 			return &ValidationError{Name: "ip_remote", err: fmt.Errorf(`ent: validator failed for field "MainIot.ip_remote": %w`, err)}
 		}
 	}
+	if _, ok := mic.mutation.Active(); !ok {
+		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "MainIot.active"`)}
+	}
 	if _, ok := mic.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MainIot.created_at"`)}
 	}
 	if _, ok := mic.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "MainIot.updated_at"`)}
+	}
+	if _, ok := mic.mutation.UserIDID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required edge "MainIot.user_id"`)}
 	}
 	return nil
 }
@@ -321,6 +351,14 @@ func (mic *MainIotCreate) createSpec() (*MainIot, *sqlgraph.CreateSpec) {
 		_spec.SetField(mainiot.FieldIPRemote, field.TypeString, value)
 		_node.IPRemote = &value
 	}
+	if value, ok := mic.mutation.Status(); ok {
+		_spec.SetField(mainiot.FieldStatus, field.TypeString, value)
+		_node.Status = &value
+	}
+	if value, ok := mic.mutation.Active(); ok {
+		_spec.SetField(mainiot.FieldActive, field.TypeBool, value)
+		_node.Active = value
+	}
 	if value, ok := mic.mutation.CreatedAt(); ok {
 		_spec.SetField(mainiot.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -345,12 +383,12 @@ func (mic *MainIotCreate) createSpec() (*MainIot, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := mic.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := mic.mutation.UserIDIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   mainiot.OwnerTable,
-			Columns: []string{mainiot.OwnerColumn},
+			Table:   mainiot.UserIDTable,
+			Columns: []string{mainiot.UserIDColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),

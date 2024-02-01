@@ -12,14 +12,22 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// DeviceDetails is the client for interacting with the DeviceDetails builders.
+	DeviceDetails *DeviceDetailsClient
 	// DeviceIot is the client for interacting with the DeviceIot builders.
 	DeviceIot *DeviceIotClient
 	// MainIot is the client for interacting with the MainIot builders.
 	MainIot *MainIotClient
+	// Payment is the client for interacting with the Payment builders.
+	Payment *PaymentClient
+	// Plan is the client for interacting with the Plan builders.
+	Plan *PlanClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserPaymentPlan is the client for interacting with the UserPaymentPlan builders.
+	UserPaymentPlan *UserPaymentPlanClient
 
 	// lazily loaded.
 	client     *Client
@@ -151,10 +159,14 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.DeviceDetails = NewDeviceDetailsClient(tx.config)
 	tx.DeviceIot = NewDeviceIotClient(tx.config)
 	tx.MainIot = NewMainIotClient(tx.config)
+	tx.Payment = NewPaymentClient(tx.config)
+	tx.Plan = NewPlanClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
 	tx.User = NewUserClient(tx.config)
+	tx.UserPaymentPlan = NewUserPaymentPlanClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -164,7 +176,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: DeviceIot.QueryXXX(), the query will be executed
+// applies a query, for example: DeviceDetails.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

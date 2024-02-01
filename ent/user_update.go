@@ -10,6 +10,7 @@ import (
 	"siliconvali/ent/predicate"
 	"siliconvali/ent/role"
 	"siliconvali/ent/user"
+	"siliconvali/ent/userpaymentplan"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -124,6 +125,34 @@ func (uu *UserUpdate) ClearNationalCode() *UserUpdate {
 	return uu
 }
 
+// SetActive sets the "active" field.
+func (uu *UserUpdate) SetActive(b bool) *UserUpdate {
+	uu.mutation.SetActive(b)
+	return uu
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableActive(b *bool) *UserUpdate {
+	if b != nil {
+		uu.SetActive(*b)
+	}
+	return uu
+}
+
+// SetDeleted sets the "deleted" field.
+func (uu *UserUpdate) SetDeleted(b bool) *UserUpdate {
+	uu.mutation.SetDeleted(b)
+	return uu
+}
+
+// SetNillableDeleted sets the "deleted" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableDeleted(b *bool) *UserUpdate {
+	if b != nil {
+		uu.SetDeleted(*b)
+	}
+	return uu
+}
+
 // SetAddress sets the "address" field.
 func (uu *UserUpdate) SetAddress(s string) *UserUpdate {
 	uu.mutation.SetAddress(s)
@@ -188,6 +217,21 @@ func (uu *UserUpdate) AddMainiots(m ...*MainIot) *UserUpdate {
 	return uu.AddMainiotIDs(ids...)
 }
 
+// AddUserpaymentplanIDs adds the "userpaymentplans" edge to the UserPaymentPlan entity by IDs.
+func (uu *UserUpdate) AddUserpaymentplanIDs(ids ...int64) *UserUpdate {
+	uu.mutation.AddUserpaymentplanIDs(ids...)
+	return uu
+}
+
+// AddUserpaymentplans adds the "userpaymentplans" edges to the UserPaymentPlan entity.
+func (uu *UserUpdate) AddUserpaymentplans(u ...*UserPaymentPlan) *UserUpdate {
+	ids := make([]int64, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.AddUserpaymentplanIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -233,6 +277,27 @@ func (uu *UserUpdate) RemoveMainiots(m ...*MainIot) *UserUpdate {
 		ids[i] = m[i].ID
 	}
 	return uu.RemoveMainiotIDs(ids...)
+}
+
+// ClearUserpaymentplans clears all "userpaymentplans" edges to the UserPaymentPlan entity.
+func (uu *UserUpdate) ClearUserpaymentplans() *UserUpdate {
+	uu.mutation.ClearUserpaymentplans()
+	return uu
+}
+
+// RemoveUserpaymentplanIDs removes the "userpaymentplans" edge to UserPaymentPlan entities by IDs.
+func (uu *UserUpdate) RemoveUserpaymentplanIDs(ids ...int64) *UserUpdate {
+	uu.mutation.RemoveUserpaymentplanIDs(ids...)
+	return uu
+}
+
+// RemoveUserpaymentplans removes "userpaymentplans" edges to UserPaymentPlan entities.
+func (uu *UserUpdate) RemoveUserpaymentplans(u ...*UserPaymentPlan) *UserUpdate {
+	ids := make([]int64, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.RemoveUserpaymentplanIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -336,6 +401,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if uu.mutation.NationalCodeCleared() {
 		_spec.ClearField(user.FieldNationalCode, field.TypeString)
 	}
+	if value, ok := uu.mutation.Active(); ok {
+		_spec.SetField(user.FieldActive, field.TypeBool, value)
+	}
+	if value, ok := uu.mutation.Deleted(); ok {
+		_spec.SetField(user.FieldDeleted, field.TypeBool, value)
+	}
 	if value, ok := uu.mutation.Address(); ok {
 		_spec.SetField(user.FieldAddress, field.TypeString, value)
 	}
@@ -428,6 +499,51 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(mainiot.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.UserpaymentplansCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserpaymentplansTable,
+			Columns: []string{user.UserpaymentplansColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userpaymentplan.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedUserpaymentplansIDs(); len(nodes) > 0 && !uu.mutation.UserpaymentplansCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserpaymentplansTable,
+			Columns: []string{user.UserpaymentplansColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userpaymentplan.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.UserpaymentplansIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserpaymentplansTable,
+			Columns: []string{user.UserpaymentplansColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userpaymentplan.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -549,6 +665,34 @@ func (uuo *UserUpdateOne) ClearNationalCode() *UserUpdateOne {
 	return uuo
 }
 
+// SetActive sets the "active" field.
+func (uuo *UserUpdateOne) SetActive(b bool) *UserUpdateOne {
+	uuo.mutation.SetActive(b)
+	return uuo
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableActive(b *bool) *UserUpdateOne {
+	if b != nil {
+		uuo.SetActive(*b)
+	}
+	return uuo
+}
+
+// SetDeleted sets the "deleted" field.
+func (uuo *UserUpdateOne) SetDeleted(b bool) *UserUpdateOne {
+	uuo.mutation.SetDeleted(b)
+	return uuo
+}
+
+// SetNillableDeleted sets the "deleted" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableDeleted(b *bool) *UserUpdateOne {
+	if b != nil {
+		uuo.SetDeleted(*b)
+	}
+	return uuo
+}
+
 // SetAddress sets the "address" field.
 func (uuo *UserUpdateOne) SetAddress(s string) *UserUpdateOne {
 	uuo.mutation.SetAddress(s)
@@ -613,6 +757,21 @@ func (uuo *UserUpdateOne) AddMainiots(m ...*MainIot) *UserUpdateOne {
 	return uuo.AddMainiotIDs(ids...)
 }
 
+// AddUserpaymentplanIDs adds the "userpaymentplans" edge to the UserPaymentPlan entity by IDs.
+func (uuo *UserUpdateOne) AddUserpaymentplanIDs(ids ...int64) *UserUpdateOne {
+	uuo.mutation.AddUserpaymentplanIDs(ids...)
+	return uuo
+}
+
+// AddUserpaymentplans adds the "userpaymentplans" edges to the UserPaymentPlan entity.
+func (uuo *UserUpdateOne) AddUserpaymentplans(u ...*UserPaymentPlan) *UserUpdateOne {
+	ids := make([]int64, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.AddUserpaymentplanIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
@@ -658,6 +817,27 @@ func (uuo *UserUpdateOne) RemoveMainiots(m ...*MainIot) *UserUpdateOne {
 		ids[i] = m[i].ID
 	}
 	return uuo.RemoveMainiotIDs(ids...)
+}
+
+// ClearUserpaymentplans clears all "userpaymentplans" edges to the UserPaymentPlan entity.
+func (uuo *UserUpdateOne) ClearUserpaymentplans() *UserUpdateOne {
+	uuo.mutation.ClearUserpaymentplans()
+	return uuo
+}
+
+// RemoveUserpaymentplanIDs removes the "userpaymentplans" edge to UserPaymentPlan entities by IDs.
+func (uuo *UserUpdateOne) RemoveUserpaymentplanIDs(ids ...int64) *UserUpdateOne {
+	uuo.mutation.RemoveUserpaymentplanIDs(ids...)
+	return uuo
+}
+
+// RemoveUserpaymentplans removes "userpaymentplans" edges to UserPaymentPlan entities.
+func (uuo *UserUpdateOne) RemoveUserpaymentplans(u ...*UserPaymentPlan) *UserUpdateOne {
+	ids := make([]int64, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.RemoveUserpaymentplanIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -791,6 +971,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if uuo.mutation.NationalCodeCleared() {
 		_spec.ClearField(user.FieldNationalCode, field.TypeString)
 	}
+	if value, ok := uuo.mutation.Active(); ok {
+		_spec.SetField(user.FieldActive, field.TypeBool, value)
+	}
+	if value, ok := uuo.mutation.Deleted(); ok {
+		_spec.SetField(user.FieldDeleted, field.TypeBool, value)
+	}
 	if value, ok := uuo.mutation.Address(); ok {
 		_spec.SetField(user.FieldAddress, field.TypeString, value)
 	}
@@ -883,6 +1069,51 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(mainiot.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.UserpaymentplansCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserpaymentplansTable,
+			Columns: []string{user.UserpaymentplansColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userpaymentplan.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedUserpaymentplansIDs(); len(nodes) > 0 && !uuo.mutation.UserpaymentplansCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserpaymentplansTable,
+			Columns: []string{user.UserpaymentplansColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userpaymentplan.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.UserpaymentplansIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserpaymentplansTable,
+			Columns: []string{user.UserpaymentplansColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userpaymentplan.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

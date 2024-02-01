@@ -70,6 +70,26 @@ func TypeDevice(v int) predicate.DeviceIot {
 	return predicate.DeviceIot(sql.FieldEQ(FieldTypeDevice, v))
 }
 
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v string) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldEQ(FieldStatus, v))
+}
+
+// Active applies equality check predicate on the "active" field. It's identical to ActiveEQ.
+func Active(v bool) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldEQ(FieldActive, v))
+}
+
+// Lat applies equality check predicate on the "lat" field. It's identical to LatEQ.
+func Lat(v float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldEQ(FieldLat, v))
+}
+
+// Lon applies equality check predicate on the "lon" field. It's identical to LonEQ.
+func Lon(v float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldEQ(FieldLon, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.DeviceIot {
 	return predicate.DeviceIot(sql.FieldEQ(FieldCreatedAt, v))
@@ -270,6 +290,191 @@ func TypeDeviceNotNil() predicate.DeviceIot {
 	return predicate.DeviceIot(sql.FieldNotNull(FieldTypeDevice))
 }
 
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v string) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v string) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...string) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...string) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v string) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v string) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v string) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v string) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldLTE(FieldStatus, v))
+}
+
+// StatusContains applies the Contains predicate on the "status" field.
+func StatusContains(v string) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldContains(FieldStatus, v))
+}
+
+// StatusHasPrefix applies the HasPrefix predicate on the "status" field.
+func StatusHasPrefix(v string) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldHasPrefix(FieldStatus, v))
+}
+
+// StatusHasSuffix applies the HasSuffix predicate on the "status" field.
+func StatusHasSuffix(v string) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldHasSuffix(FieldStatus, v))
+}
+
+// StatusIsNil applies the IsNil predicate on the "status" field.
+func StatusIsNil() predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldIsNull(FieldStatus))
+}
+
+// StatusNotNil applies the NotNil predicate on the "status" field.
+func StatusNotNil() predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldNotNull(FieldStatus))
+}
+
+// StatusEqualFold applies the EqualFold predicate on the "status" field.
+func StatusEqualFold(v string) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldEqualFold(FieldStatus, v))
+}
+
+// StatusContainsFold applies the ContainsFold predicate on the "status" field.
+func StatusContainsFold(v string) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldContainsFold(FieldStatus, v))
+}
+
+// ActiveEQ applies the EQ predicate on the "active" field.
+func ActiveEQ(v bool) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldEQ(FieldActive, v))
+}
+
+// ActiveNEQ applies the NEQ predicate on the "active" field.
+func ActiveNEQ(v bool) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldNEQ(FieldActive, v))
+}
+
+// LatEQ applies the EQ predicate on the "lat" field.
+func LatEQ(v float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldEQ(FieldLat, v))
+}
+
+// LatNEQ applies the NEQ predicate on the "lat" field.
+func LatNEQ(v float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldNEQ(FieldLat, v))
+}
+
+// LatIn applies the In predicate on the "lat" field.
+func LatIn(vs ...float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldIn(FieldLat, vs...))
+}
+
+// LatNotIn applies the NotIn predicate on the "lat" field.
+func LatNotIn(vs ...float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldNotIn(FieldLat, vs...))
+}
+
+// LatGT applies the GT predicate on the "lat" field.
+func LatGT(v float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldGT(FieldLat, v))
+}
+
+// LatGTE applies the GTE predicate on the "lat" field.
+func LatGTE(v float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldGTE(FieldLat, v))
+}
+
+// LatLT applies the LT predicate on the "lat" field.
+func LatLT(v float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldLT(FieldLat, v))
+}
+
+// LatLTE applies the LTE predicate on the "lat" field.
+func LatLTE(v float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldLTE(FieldLat, v))
+}
+
+// LatIsNil applies the IsNil predicate on the "lat" field.
+func LatIsNil() predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldIsNull(FieldLat))
+}
+
+// LatNotNil applies the NotNil predicate on the "lat" field.
+func LatNotNil() predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldNotNull(FieldLat))
+}
+
+// LonEQ applies the EQ predicate on the "lon" field.
+func LonEQ(v float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldEQ(FieldLon, v))
+}
+
+// LonNEQ applies the NEQ predicate on the "lon" field.
+func LonNEQ(v float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldNEQ(FieldLon, v))
+}
+
+// LonIn applies the In predicate on the "lon" field.
+func LonIn(vs ...float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldIn(FieldLon, vs...))
+}
+
+// LonNotIn applies the NotIn predicate on the "lon" field.
+func LonNotIn(vs ...float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldNotIn(FieldLon, vs...))
+}
+
+// LonGT applies the GT predicate on the "lon" field.
+func LonGT(v float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldGT(FieldLon, v))
+}
+
+// LonGTE applies the GTE predicate on the "lon" field.
+func LonGTE(v float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldGTE(FieldLon, v))
+}
+
+// LonLT applies the LT predicate on the "lon" field.
+func LonLT(v float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldLT(FieldLon, v))
+}
+
+// LonLTE applies the LTE predicate on the "lon" field.
+func LonLTE(v float64) predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldLTE(FieldLon, v))
+}
+
+// LonIsNil applies the IsNil predicate on the "lon" field.
+func LonIsNil() predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldIsNull(FieldLon))
+}
+
+// LonNotNil applies the NotNil predicate on the "lon" field.
+func LonNotNil() predicate.DeviceIot {
+	return predicate.DeviceIot(sql.FieldNotNull(FieldLon))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.DeviceIot {
 	return predicate.DeviceIot(sql.FieldEQ(FieldCreatedAt, v))
@@ -350,21 +555,44 @@ func UpdatedAtLTE(v time.Time) predicate.DeviceIot {
 	return predicate.DeviceIot(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
-// HasOwner applies the HasEdge predicate on the "owner" edge.
-func HasOwner() predicate.DeviceIot {
+// HasMainiotID applies the HasEdge predicate on the "mainiot_id" edge.
+func HasMainiotID() predicate.DeviceIot {
 	return predicate.DeviceIot(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, MainiotIDTable, MainiotIDColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasOwnerWith applies the HasEdge predicate on the "owner" edge with a given conditions (other predicates).
-func HasOwnerWith(preds ...predicate.MainIot) predicate.DeviceIot {
+// HasMainiotIDWith applies the HasEdge predicate on the "mainiot_id" edge with a given conditions (other predicates).
+func HasMainiotIDWith(preds ...predicate.MainIot) predicate.DeviceIot {
 	return predicate.DeviceIot(func(s *sql.Selector) {
-		step := newOwnerStep()
+		step := newMainiotIDStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDevicedetails applies the HasEdge predicate on the "devicedetails" edge.
+func HasDevicedetails() predicate.DeviceIot {
+	return predicate.DeviceIot(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, DevicedetailsTable, DevicedetailsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDevicedetailsWith applies the HasEdge predicate on the "devicedetails" edge with a given conditions (other predicates).
+func HasDevicedetailsWith(preds ...predicate.DeviceDetails) predicate.DeviceIot {
+	return predicate.DeviceIot(func(s *sql.Selector) {
+		step := newDevicedetailsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

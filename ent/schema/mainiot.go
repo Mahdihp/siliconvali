@@ -37,6 +37,8 @@ func (MainIot) Fields() []ent.Field {
 		field.String("serial_number").MaxLen(15).Optional().Nillable(),
 		field.String("mac_address").MaxLen(15).Optional().Nillable(),
 		field.String("ip_remote").MaxLen(40).Optional().Nillable(),
+		field.String("status").Optional().Nillable().Comment("وضعیت"),
+		field.Bool("active").Default(true).Comment("فعال بودن"),
 
 		field.Time("created_at").
 			SchemaType(map[string]string{
@@ -54,6 +56,7 @@ func (MainIot) Fields() []ent.Field {
 func (MainIot) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("deviceiots", DeviceIot.Type),
-		edge.From("owner", User.Type).Ref("mainiots").Unique(),
+
+		edge.From("user_id", User.Type).Ref("mainiots").Unique().Required(),
 	}
 }

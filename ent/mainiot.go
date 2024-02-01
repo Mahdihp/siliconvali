@@ -32,6 +32,10 @@ type MainIot struct {
 	MACAddress *string `json:"mac_address,omitempty"`
 	// IPRemote holds the value of the "ip_remote" field.
 	IPRemote *string `json:"ip_remote,omitempty"`
+	// وضعیت
+	Status *string `json:"status,omitempty"`
+	// فعال بودن
+	Active bool `json:"active,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -47,8 +51,8 @@ type MainIot struct {
 type MainIotEdges struct {
 	// Deviceiots holds the value of the deviceiots edge.
 	Deviceiots []*DeviceIot `json:"deviceiots,omitempty"`
-	// Owner holds the value of the owner edge.
-	Owner *User `json:"owner,omitempty"`
+	// UserID holds the value of the user_id edge.
+	UserID *User `json:"user_id,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -63,17 +67,17 @@ func (e MainIotEdges) DeviceiotsOrErr() ([]*DeviceIot, error) {
 	return nil, &NotLoadedError{edge: "deviceiots"}
 }
 
-// OwnerOrErr returns the Owner value or an error if the edge
+// UserIDOrErr returns the UserID value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e MainIotEdges) OwnerOrErr() (*User, error) {
+func (e MainIotEdges) UserIDOrErr() (*User, error) {
 	if e.loadedTypes[1] {
-		if e.Owner == nil {
+		if e.UserID == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
 		}
-		return e.Owner, nil
+		return e.UserID, nil
 	}
-	return nil, &NotLoadedError{edge: "owner"}
+	return nil, &NotLoadedError{edge: "user_id"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -81,11 +85,13 @@ func (*MainIot) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case mainiot.FieldActive:
+			values[i] = new(sql.NullBool)
 		case mainiot.FieldLat, mainiot.FieldLon:
 			values[i] = new(sql.NullFloat64)
 		case mainiot.FieldID:
 			values[i] = new(sql.NullInt64)
-		case mainiot.FieldDisplayName, mainiot.FieldAddress, mainiot.FieldSerialNumber, mainiot.FieldMACAddress, mainiot.FieldIPRemote:
+		case mainiot.FieldDisplayName, mainiot.FieldAddress, mainiot.FieldSerialNumber, mainiot.FieldMACAddress, mainiot.FieldIPRemote, mainiot.FieldStatus:
 			values[i] = new(sql.NullString)
 		case mainiot.FieldCreatedAt, mainiot.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -160,6 +166,19 @@ func (mi *MainIot) assignValues(columns []string, values []any) error {
 				mi.IPRemote = new(string)
 				*mi.IPRemote = value.String
 			}
+		case mainiot.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				mi.Status = new(string)
+				*mi.Status = value.String
+			}
+		case mainiot.FieldActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field active", values[i])
+			} else if value.Valid {
+				mi.Active = value.Bool
+			}
 		case mainiot.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -197,9 +216,9 @@ func (mi *MainIot) QueryDeviceiots() *DeviceIotQuery {
 	return NewMainIotClient(mi.config).QueryDeviceiots(mi)
 }
 
-// QueryOwner queries the "owner" edge of the MainIot entity.
-func (mi *MainIot) QueryOwner() *UserQuery {
-	return NewMainIotClient(mi.config).QueryOwner(mi)
+// QueryUserID queries the "user_id" edge of the MainIot entity.
+func (mi *MainIot) QueryUserID() *UserQuery {
+	return NewMainIotClient(mi.config).QueryUserID(mi)
 }
 
 // Update returns a builder for updating this MainIot.
@@ -257,6 +276,14 @@ func (mi *MainIot) String() string {
 		builder.WriteString("ip_remote=")
 		builder.WriteString(*v)
 	}
+	builder.WriteString(", ")
+	if v := mi.Status; v != nil {
+		builder.WriteString("status=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	builder.WriteString("active=")
+	builder.WriteString(fmt.Sprintf("%v", mi.Active))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(mi.CreatedAt.Format(time.ANSIC))

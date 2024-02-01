@@ -7,10 +7,14 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"siliconvali/ent/devicedetails"
 	"siliconvali/ent/deviceiot"
 	"siliconvali/ent/mainiot"
+	"siliconvali/ent/payment"
+	"siliconvali/ent/plan"
 	"siliconvali/ent/role"
 	"siliconvali/ent/user"
+	"siliconvali/ent/userpaymentplan"
 	"sync"
 
 	"entgo.io/ent"
@@ -76,10 +80,14 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			deviceiot.Table: deviceiot.ValidColumn,
-			mainiot.Table:   mainiot.ValidColumn,
-			role.Table:      role.ValidColumn,
-			user.Table:      user.ValidColumn,
+			devicedetails.Table:   devicedetails.ValidColumn,
+			deviceiot.Table:       deviceiot.ValidColumn,
+			mainiot.Table:         mainiot.ValidColumn,
+			payment.Table:         payment.ValidColumn,
+			plan.Table:            plan.ValidColumn,
+			role.Table:            role.ValidColumn,
+			user.Table:            user.ValidColumn,
+			userpaymentplan.Table: userpaymentplan.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

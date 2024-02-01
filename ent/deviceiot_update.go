@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"siliconvali/ent/devicedetails"
 	"siliconvali/ent/deviceiot"
 	"siliconvali/ent/mainiot"
 	"siliconvali/ent/predicate"
@@ -90,6 +91,94 @@ func (diu *DeviceIotUpdate) ClearTypeDevice() *DeviceIotUpdate {
 	return diu
 }
 
+// SetStatus sets the "status" field.
+func (diu *DeviceIotUpdate) SetStatus(s string) *DeviceIotUpdate {
+	diu.mutation.SetStatus(s)
+	return diu
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (diu *DeviceIotUpdate) SetNillableStatus(s *string) *DeviceIotUpdate {
+	if s != nil {
+		diu.SetStatus(*s)
+	}
+	return diu
+}
+
+// ClearStatus clears the value of the "status" field.
+func (diu *DeviceIotUpdate) ClearStatus() *DeviceIotUpdate {
+	diu.mutation.ClearStatus()
+	return diu
+}
+
+// SetActive sets the "active" field.
+func (diu *DeviceIotUpdate) SetActive(b bool) *DeviceIotUpdate {
+	diu.mutation.SetActive(b)
+	return diu
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (diu *DeviceIotUpdate) SetNillableActive(b *bool) *DeviceIotUpdate {
+	if b != nil {
+		diu.SetActive(*b)
+	}
+	return diu
+}
+
+// SetLat sets the "lat" field.
+func (diu *DeviceIotUpdate) SetLat(f float64) *DeviceIotUpdate {
+	diu.mutation.ResetLat()
+	diu.mutation.SetLat(f)
+	return diu
+}
+
+// SetNillableLat sets the "lat" field if the given value is not nil.
+func (diu *DeviceIotUpdate) SetNillableLat(f *float64) *DeviceIotUpdate {
+	if f != nil {
+		diu.SetLat(*f)
+	}
+	return diu
+}
+
+// AddLat adds f to the "lat" field.
+func (diu *DeviceIotUpdate) AddLat(f float64) *DeviceIotUpdate {
+	diu.mutation.AddLat(f)
+	return diu
+}
+
+// ClearLat clears the value of the "lat" field.
+func (diu *DeviceIotUpdate) ClearLat() *DeviceIotUpdate {
+	diu.mutation.ClearLat()
+	return diu
+}
+
+// SetLon sets the "lon" field.
+func (diu *DeviceIotUpdate) SetLon(f float64) *DeviceIotUpdate {
+	diu.mutation.ResetLon()
+	diu.mutation.SetLon(f)
+	return diu
+}
+
+// SetNillableLon sets the "lon" field if the given value is not nil.
+func (diu *DeviceIotUpdate) SetNillableLon(f *float64) *DeviceIotUpdate {
+	if f != nil {
+		diu.SetLon(*f)
+	}
+	return diu
+}
+
+// AddLon adds f to the "lon" field.
+func (diu *DeviceIotUpdate) AddLon(f float64) *DeviceIotUpdate {
+	diu.mutation.AddLon(f)
+	return diu
+}
+
+// ClearLon clears the value of the "lon" field.
+func (diu *DeviceIotUpdate) ClearLon() *DeviceIotUpdate {
+	diu.mutation.ClearLon()
+	return diu
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (diu *DeviceIotUpdate) SetUpdatedAt(t time.Time) *DeviceIotUpdate {
 	diu.mutation.SetUpdatedAt(t)
@@ -104,23 +193,38 @@ func (diu *DeviceIotUpdate) SetNillableUpdatedAt(t *time.Time) *DeviceIotUpdate 
 	return diu
 }
 
-// SetOwnerID sets the "owner" edge to the MainIot entity by ID.
-func (diu *DeviceIotUpdate) SetOwnerID(id int64) *DeviceIotUpdate {
-	diu.mutation.SetOwnerID(id)
+// SetMainiotIDID sets the "mainiot_id" edge to the MainIot entity by ID.
+func (diu *DeviceIotUpdate) SetMainiotIDID(id int64) *DeviceIotUpdate {
+	diu.mutation.SetMainiotIDID(id)
 	return diu
 }
 
-// SetNillableOwnerID sets the "owner" edge to the MainIot entity by ID if the given value is not nil.
-func (diu *DeviceIotUpdate) SetNillableOwnerID(id *int64) *DeviceIotUpdate {
+// SetNillableMainiotIDID sets the "mainiot_id" edge to the MainIot entity by ID if the given value is not nil.
+func (diu *DeviceIotUpdate) SetNillableMainiotIDID(id *int64) *DeviceIotUpdate {
 	if id != nil {
-		diu = diu.SetOwnerID(*id)
+		diu = diu.SetMainiotIDID(*id)
 	}
 	return diu
 }
 
-// SetOwner sets the "owner" edge to the MainIot entity.
-func (diu *DeviceIotUpdate) SetOwner(m *MainIot) *DeviceIotUpdate {
-	return diu.SetOwnerID(m.ID)
+// SetMainiotID sets the "mainiot_id" edge to the MainIot entity.
+func (diu *DeviceIotUpdate) SetMainiotID(m *MainIot) *DeviceIotUpdate {
+	return diu.SetMainiotIDID(m.ID)
+}
+
+// AddDevicedetailIDs adds the "devicedetails" edge to the DeviceDetails entity by IDs.
+func (diu *DeviceIotUpdate) AddDevicedetailIDs(ids ...int) *DeviceIotUpdate {
+	diu.mutation.AddDevicedetailIDs(ids...)
+	return diu
+}
+
+// AddDevicedetails adds the "devicedetails" edges to the DeviceDetails entity.
+func (diu *DeviceIotUpdate) AddDevicedetails(d ...*DeviceDetails) *DeviceIotUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return diu.AddDevicedetailIDs(ids...)
 }
 
 // Mutation returns the DeviceIotMutation object of the builder.
@@ -128,10 +232,31 @@ func (diu *DeviceIotUpdate) Mutation() *DeviceIotMutation {
 	return diu.mutation
 }
 
-// ClearOwner clears the "owner" edge to the MainIot entity.
-func (diu *DeviceIotUpdate) ClearOwner() *DeviceIotUpdate {
-	diu.mutation.ClearOwner()
+// ClearMainiotID clears the "mainiot_id" edge to the MainIot entity.
+func (diu *DeviceIotUpdate) ClearMainiotID() *DeviceIotUpdate {
+	diu.mutation.ClearMainiotID()
 	return diu
+}
+
+// ClearDevicedetails clears all "devicedetails" edges to the DeviceDetails entity.
+func (diu *DeviceIotUpdate) ClearDevicedetails() *DeviceIotUpdate {
+	diu.mutation.ClearDevicedetails()
+	return diu
+}
+
+// RemoveDevicedetailIDs removes the "devicedetails" edge to DeviceDetails entities by IDs.
+func (diu *DeviceIotUpdate) RemoveDevicedetailIDs(ids ...int) *DeviceIotUpdate {
+	diu.mutation.RemoveDevicedetailIDs(ids...)
+	return diu
+}
+
+// RemoveDevicedetails removes "devicedetails" edges to DeviceDetails entities.
+func (diu *DeviceIotUpdate) RemoveDevicedetails(d ...*DeviceDetails) *DeviceIotUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return diu.RemoveDevicedetailIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -206,15 +331,42 @@ func (diu *DeviceIotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if diu.mutation.TypeDeviceCleared() {
 		_spec.ClearField(deviceiot.FieldTypeDevice, field.TypeInt)
 	}
+	if value, ok := diu.mutation.Status(); ok {
+		_spec.SetField(deviceiot.FieldStatus, field.TypeString, value)
+	}
+	if diu.mutation.StatusCleared() {
+		_spec.ClearField(deviceiot.FieldStatus, field.TypeString)
+	}
+	if value, ok := diu.mutation.Active(); ok {
+		_spec.SetField(deviceiot.FieldActive, field.TypeBool, value)
+	}
+	if value, ok := diu.mutation.Lat(); ok {
+		_spec.SetField(deviceiot.FieldLat, field.TypeFloat64, value)
+	}
+	if value, ok := diu.mutation.AddedLat(); ok {
+		_spec.AddField(deviceiot.FieldLat, field.TypeFloat64, value)
+	}
+	if diu.mutation.LatCleared() {
+		_spec.ClearField(deviceiot.FieldLat, field.TypeFloat64)
+	}
+	if value, ok := diu.mutation.Lon(); ok {
+		_spec.SetField(deviceiot.FieldLon, field.TypeFloat64, value)
+	}
+	if value, ok := diu.mutation.AddedLon(); ok {
+		_spec.AddField(deviceiot.FieldLon, field.TypeFloat64, value)
+	}
+	if diu.mutation.LonCleared() {
+		_spec.ClearField(deviceiot.FieldLon, field.TypeFloat64)
+	}
 	if value, ok := diu.mutation.UpdatedAt(); ok {
 		_spec.SetField(deviceiot.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if diu.mutation.OwnerCleared() {
+	if diu.mutation.MainiotIDCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   deviceiot.OwnerTable,
-			Columns: []string{deviceiot.OwnerColumn},
+			Table:   deviceiot.MainiotIDTable,
+			Columns: []string{deviceiot.MainiotIDColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(mainiot.FieldID, field.TypeInt64),
@@ -222,15 +374,60 @@ func (diu *DeviceIotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := diu.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := diu.mutation.MainiotIDIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   deviceiot.OwnerTable,
-			Columns: []string{deviceiot.OwnerColumn},
+			Table:   deviceiot.MainiotIDTable,
+			Columns: []string{deviceiot.MainiotIDColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(mainiot.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if diu.mutation.DevicedetailsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   deviceiot.DevicedetailsTable,
+			Columns: []string{deviceiot.DevicedetailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(devicedetails.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := diu.mutation.RemovedDevicedetailsIDs(); len(nodes) > 0 && !diu.mutation.DevicedetailsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   deviceiot.DevicedetailsTable,
+			Columns: []string{deviceiot.DevicedetailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(devicedetails.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := diu.mutation.DevicedetailsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   deviceiot.DevicedetailsTable,
+			Columns: []string{deviceiot.DevicedetailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(devicedetails.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -319,6 +516,94 @@ func (diuo *DeviceIotUpdateOne) ClearTypeDevice() *DeviceIotUpdateOne {
 	return diuo
 }
 
+// SetStatus sets the "status" field.
+func (diuo *DeviceIotUpdateOne) SetStatus(s string) *DeviceIotUpdateOne {
+	diuo.mutation.SetStatus(s)
+	return diuo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (diuo *DeviceIotUpdateOne) SetNillableStatus(s *string) *DeviceIotUpdateOne {
+	if s != nil {
+		diuo.SetStatus(*s)
+	}
+	return diuo
+}
+
+// ClearStatus clears the value of the "status" field.
+func (diuo *DeviceIotUpdateOne) ClearStatus() *DeviceIotUpdateOne {
+	diuo.mutation.ClearStatus()
+	return diuo
+}
+
+// SetActive sets the "active" field.
+func (diuo *DeviceIotUpdateOne) SetActive(b bool) *DeviceIotUpdateOne {
+	diuo.mutation.SetActive(b)
+	return diuo
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (diuo *DeviceIotUpdateOne) SetNillableActive(b *bool) *DeviceIotUpdateOne {
+	if b != nil {
+		diuo.SetActive(*b)
+	}
+	return diuo
+}
+
+// SetLat sets the "lat" field.
+func (diuo *DeviceIotUpdateOne) SetLat(f float64) *DeviceIotUpdateOne {
+	diuo.mutation.ResetLat()
+	diuo.mutation.SetLat(f)
+	return diuo
+}
+
+// SetNillableLat sets the "lat" field if the given value is not nil.
+func (diuo *DeviceIotUpdateOne) SetNillableLat(f *float64) *DeviceIotUpdateOne {
+	if f != nil {
+		diuo.SetLat(*f)
+	}
+	return diuo
+}
+
+// AddLat adds f to the "lat" field.
+func (diuo *DeviceIotUpdateOne) AddLat(f float64) *DeviceIotUpdateOne {
+	diuo.mutation.AddLat(f)
+	return diuo
+}
+
+// ClearLat clears the value of the "lat" field.
+func (diuo *DeviceIotUpdateOne) ClearLat() *DeviceIotUpdateOne {
+	diuo.mutation.ClearLat()
+	return diuo
+}
+
+// SetLon sets the "lon" field.
+func (diuo *DeviceIotUpdateOne) SetLon(f float64) *DeviceIotUpdateOne {
+	diuo.mutation.ResetLon()
+	diuo.mutation.SetLon(f)
+	return diuo
+}
+
+// SetNillableLon sets the "lon" field if the given value is not nil.
+func (diuo *DeviceIotUpdateOne) SetNillableLon(f *float64) *DeviceIotUpdateOne {
+	if f != nil {
+		diuo.SetLon(*f)
+	}
+	return diuo
+}
+
+// AddLon adds f to the "lon" field.
+func (diuo *DeviceIotUpdateOne) AddLon(f float64) *DeviceIotUpdateOne {
+	diuo.mutation.AddLon(f)
+	return diuo
+}
+
+// ClearLon clears the value of the "lon" field.
+func (diuo *DeviceIotUpdateOne) ClearLon() *DeviceIotUpdateOne {
+	diuo.mutation.ClearLon()
+	return diuo
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (diuo *DeviceIotUpdateOne) SetUpdatedAt(t time.Time) *DeviceIotUpdateOne {
 	diuo.mutation.SetUpdatedAt(t)
@@ -333,23 +618,38 @@ func (diuo *DeviceIotUpdateOne) SetNillableUpdatedAt(t *time.Time) *DeviceIotUpd
 	return diuo
 }
 
-// SetOwnerID sets the "owner" edge to the MainIot entity by ID.
-func (diuo *DeviceIotUpdateOne) SetOwnerID(id int64) *DeviceIotUpdateOne {
-	diuo.mutation.SetOwnerID(id)
+// SetMainiotIDID sets the "mainiot_id" edge to the MainIot entity by ID.
+func (diuo *DeviceIotUpdateOne) SetMainiotIDID(id int64) *DeviceIotUpdateOne {
+	diuo.mutation.SetMainiotIDID(id)
 	return diuo
 }
 
-// SetNillableOwnerID sets the "owner" edge to the MainIot entity by ID if the given value is not nil.
-func (diuo *DeviceIotUpdateOne) SetNillableOwnerID(id *int64) *DeviceIotUpdateOne {
+// SetNillableMainiotIDID sets the "mainiot_id" edge to the MainIot entity by ID if the given value is not nil.
+func (diuo *DeviceIotUpdateOne) SetNillableMainiotIDID(id *int64) *DeviceIotUpdateOne {
 	if id != nil {
-		diuo = diuo.SetOwnerID(*id)
+		diuo = diuo.SetMainiotIDID(*id)
 	}
 	return diuo
 }
 
-// SetOwner sets the "owner" edge to the MainIot entity.
-func (diuo *DeviceIotUpdateOne) SetOwner(m *MainIot) *DeviceIotUpdateOne {
-	return diuo.SetOwnerID(m.ID)
+// SetMainiotID sets the "mainiot_id" edge to the MainIot entity.
+func (diuo *DeviceIotUpdateOne) SetMainiotID(m *MainIot) *DeviceIotUpdateOne {
+	return diuo.SetMainiotIDID(m.ID)
+}
+
+// AddDevicedetailIDs adds the "devicedetails" edge to the DeviceDetails entity by IDs.
+func (diuo *DeviceIotUpdateOne) AddDevicedetailIDs(ids ...int) *DeviceIotUpdateOne {
+	diuo.mutation.AddDevicedetailIDs(ids...)
+	return diuo
+}
+
+// AddDevicedetails adds the "devicedetails" edges to the DeviceDetails entity.
+func (diuo *DeviceIotUpdateOne) AddDevicedetails(d ...*DeviceDetails) *DeviceIotUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return diuo.AddDevicedetailIDs(ids...)
 }
 
 // Mutation returns the DeviceIotMutation object of the builder.
@@ -357,10 +657,31 @@ func (diuo *DeviceIotUpdateOne) Mutation() *DeviceIotMutation {
 	return diuo.mutation
 }
 
-// ClearOwner clears the "owner" edge to the MainIot entity.
-func (diuo *DeviceIotUpdateOne) ClearOwner() *DeviceIotUpdateOne {
-	diuo.mutation.ClearOwner()
+// ClearMainiotID clears the "mainiot_id" edge to the MainIot entity.
+func (diuo *DeviceIotUpdateOne) ClearMainiotID() *DeviceIotUpdateOne {
+	diuo.mutation.ClearMainiotID()
 	return diuo
+}
+
+// ClearDevicedetails clears all "devicedetails" edges to the DeviceDetails entity.
+func (diuo *DeviceIotUpdateOne) ClearDevicedetails() *DeviceIotUpdateOne {
+	diuo.mutation.ClearDevicedetails()
+	return diuo
+}
+
+// RemoveDevicedetailIDs removes the "devicedetails" edge to DeviceDetails entities by IDs.
+func (diuo *DeviceIotUpdateOne) RemoveDevicedetailIDs(ids ...int) *DeviceIotUpdateOne {
+	diuo.mutation.RemoveDevicedetailIDs(ids...)
+	return diuo
+}
+
+// RemoveDevicedetails removes "devicedetails" edges to DeviceDetails entities.
+func (diuo *DeviceIotUpdateOne) RemoveDevicedetails(d ...*DeviceDetails) *DeviceIotUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return diuo.RemoveDevicedetailIDs(ids...)
 }
 
 // Where appends a list predicates to the DeviceIotUpdate builder.
@@ -465,15 +786,42 @@ func (diuo *DeviceIotUpdateOne) sqlSave(ctx context.Context) (_node *DeviceIot, 
 	if diuo.mutation.TypeDeviceCleared() {
 		_spec.ClearField(deviceiot.FieldTypeDevice, field.TypeInt)
 	}
+	if value, ok := diuo.mutation.Status(); ok {
+		_spec.SetField(deviceiot.FieldStatus, field.TypeString, value)
+	}
+	if diuo.mutation.StatusCleared() {
+		_spec.ClearField(deviceiot.FieldStatus, field.TypeString)
+	}
+	if value, ok := diuo.mutation.Active(); ok {
+		_spec.SetField(deviceiot.FieldActive, field.TypeBool, value)
+	}
+	if value, ok := diuo.mutation.Lat(); ok {
+		_spec.SetField(deviceiot.FieldLat, field.TypeFloat64, value)
+	}
+	if value, ok := diuo.mutation.AddedLat(); ok {
+		_spec.AddField(deviceiot.FieldLat, field.TypeFloat64, value)
+	}
+	if diuo.mutation.LatCleared() {
+		_spec.ClearField(deviceiot.FieldLat, field.TypeFloat64)
+	}
+	if value, ok := diuo.mutation.Lon(); ok {
+		_spec.SetField(deviceiot.FieldLon, field.TypeFloat64, value)
+	}
+	if value, ok := diuo.mutation.AddedLon(); ok {
+		_spec.AddField(deviceiot.FieldLon, field.TypeFloat64, value)
+	}
+	if diuo.mutation.LonCleared() {
+		_spec.ClearField(deviceiot.FieldLon, field.TypeFloat64)
+	}
 	if value, ok := diuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(deviceiot.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if diuo.mutation.OwnerCleared() {
+	if diuo.mutation.MainiotIDCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   deviceiot.OwnerTable,
-			Columns: []string{deviceiot.OwnerColumn},
+			Table:   deviceiot.MainiotIDTable,
+			Columns: []string{deviceiot.MainiotIDColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(mainiot.FieldID, field.TypeInt64),
@@ -481,15 +829,60 @@ func (diuo *DeviceIotUpdateOne) sqlSave(ctx context.Context) (_node *DeviceIot, 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := diuo.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := diuo.mutation.MainiotIDIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   deviceiot.OwnerTable,
-			Columns: []string{deviceiot.OwnerColumn},
+			Table:   deviceiot.MainiotIDTable,
+			Columns: []string{deviceiot.MainiotIDColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(mainiot.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if diuo.mutation.DevicedetailsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   deviceiot.DevicedetailsTable,
+			Columns: []string{deviceiot.DevicedetailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(devicedetails.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := diuo.mutation.RemovedDevicedetailsIDs(); len(nodes) > 0 && !diuo.mutation.DevicedetailsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   deviceiot.DevicedetailsTable,
+			Columns: []string{deviceiot.DevicedetailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(devicedetails.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := diuo.mutation.DevicedetailsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   deviceiot.DevicedetailsTable,
+			Columns: []string{deviceiot.DevicedetailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(devicedetails.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

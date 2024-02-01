@@ -24,6 +24,14 @@ type DeviceIot struct {
 	SerialNumber *string `json:"serial_number,omitempty"`
 	// TypeDevice holds the value of the "type_device" field.
 	TypeDevice *int `json:"type_device,omitempty"`
+	// وضعیت
+	Status *string `json:"status,omitempty"`
+	// فعال بودن
+	Active bool `json:"active,omitempty"`
+	// Lat holds the value of the "lat" field.
+	Lat *float64 `json:"lat,omitempty"`
+	// Lon holds the value of the "lon" field.
+	Lon *float64 `json:"lon,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -37,24 +45,35 @@ type DeviceIot struct {
 
 // DeviceIotEdges holds the relations/edges for other nodes in the graph.
 type DeviceIotEdges struct {
-	// Owner holds the value of the owner edge.
-	Owner *MainIot `json:"owner,omitempty"`
+	// MainiotID holds the value of the mainiot_id edge.
+	MainiotID *MainIot `json:"mainiot_id,omitempty"`
+	// Devicedetails holds the value of the devicedetails edge.
+	Devicedetails []*DeviceDetails `json:"devicedetails,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
-// OwnerOrErr returns the Owner value or an error if the edge
+// MainiotIDOrErr returns the MainiotID value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e DeviceIotEdges) OwnerOrErr() (*MainIot, error) {
+func (e DeviceIotEdges) MainiotIDOrErr() (*MainIot, error) {
 	if e.loadedTypes[0] {
-		if e.Owner == nil {
+		if e.MainiotID == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: mainiot.Label}
 		}
-		return e.Owner, nil
+		return e.MainiotID, nil
 	}
-	return nil, &NotLoadedError{edge: "owner"}
+	return nil, &NotLoadedError{edge: "mainiot_id"}
+}
+
+// DevicedetailsOrErr returns the Devicedetails value or an error if the edge
+// was not loaded in eager-loading.
+func (e DeviceIotEdges) DevicedetailsOrErr() ([]*DeviceDetails, error) {
+	if e.loadedTypes[1] {
+		return e.Devicedetails, nil
+	}
+	return nil, &NotLoadedError{edge: "devicedetails"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -62,9 +81,13 @@ func (*DeviceIot) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case deviceiot.FieldActive:
+			values[i] = new(sql.NullBool)
+		case deviceiot.FieldLat, deviceiot.FieldLon:
+			values[i] = new(sql.NullFloat64)
 		case deviceiot.FieldID, deviceiot.FieldTypeDevice:
 			values[i] = new(sql.NullInt64)
-		case deviceiot.FieldDisplayName, deviceiot.FieldSerialNumber:
+		case deviceiot.FieldDisplayName, deviceiot.FieldSerialNumber, deviceiot.FieldStatus:
 			values[i] = new(sql.NullString)
 		case deviceiot.FieldCreatedAt, deviceiot.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -111,6 +134,33 @@ func (di *DeviceIot) assignValues(columns []string, values []any) error {
 				di.TypeDevice = new(int)
 				*di.TypeDevice = int(value.Int64)
 			}
+		case deviceiot.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				di.Status = new(string)
+				*di.Status = value.String
+			}
+		case deviceiot.FieldActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field active", values[i])
+			} else if value.Valid {
+				di.Active = value.Bool
+			}
+		case deviceiot.FieldLat:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field lat", values[i])
+			} else if value.Valid {
+				di.Lat = new(float64)
+				*di.Lat = value.Float64
+			}
+		case deviceiot.FieldLon:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field lon", values[i])
+			} else if value.Valid {
+				di.Lon = new(float64)
+				*di.Lon = value.Float64
+			}
 		case deviceiot.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -143,9 +193,14 @@ func (di *DeviceIot) Value(name string) (ent.Value, error) {
 	return di.selectValues.Get(name)
 }
 
-// QueryOwner queries the "owner" edge of the DeviceIot entity.
-func (di *DeviceIot) QueryOwner() *MainIotQuery {
-	return NewDeviceIotClient(di.config).QueryOwner(di)
+// QueryMainiotID queries the "mainiot_id" edge of the DeviceIot entity.
+func (di *DeviceIot) QueryMainiotID() *MainIotQuery {
+	return NewDeviceIotClient(di.config).QueryMainiotID(di)
+}
+
+// QueryDevicedetails queries the "devicedetails" edge of the DeviceIot entity.
+func (di *DeviceIot) QueryDevicedetails() *DeviceDetailsQuery {
+	return NewDeviceIotClient(di.config).QueryDevicedetails(di)
 }
 
 // Update returns a builder for updating this DeviceIot.
@@ -181,6 +236,24 @@ func (di *DeviceIot) String() string {
 	builder.WriteString(", ")
 	if v := di.TypeDevice; v != nil {
 		builder.WriteString("type_device=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := di.Status; v != nil {
+		builder.WriteString("status=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	builder.WriteString("active=")
+	builder.WriteString(fmt.Sprintf("%v", di.Active))
+	builder.WriteString(", ")
+	if v := di.Lat; v != nil {
+		builder.WriteString("lat=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := di.Lon; v != nil {
+		builder.WriteString("lon=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")

@@ -6,14 +6,26 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// DeviceDetails is the predicate function for devicedetails builders.
+type DeviceDetails func(*sql.Selector)
+
 // DeviceIot is the predicate function for deviceiot builders.
 type DeviceIot func(*sql.Selector)
 
 // MainIot is the predicate function for mainiot builders.
 type MainIot func(*sql.Selector)
 
+// Payment is the predicate function for payment builders.
+type Payment func(*sql.Selector)
+
+// Plan is the predicate function for plan builders.
+type Plan func(*sql.Selector)
+
 // Role is the predicate function for role builders.
 type Role func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
+
+// UserPaymentPlan is the predicate function for userpaymentplan builders.
+type UserPaymentPlan func(*sql.Selector)

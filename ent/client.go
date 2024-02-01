@@ -11,10 +11,14 @@ import (
 
 	"siliconvali/ent/migrate"
 
+	"siliconvali/ent/devicedetails"
 	"siliconvali/ent/deviceiot"
 	"siliconvali/ent/mainiot"
+	"siliconvali/ent/payment"
+	"siliconvali/ent/plan"
 	"siliconvali/ent/role"
 	"siliconvali/ent/user"
+	"siliconvali/ent/userpaymentplan"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -27,14 +31,22 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// DeviceDetails is the client for interacting with the DeviceDetails builders.
+	DeviceDetails *DeviceDetailsClient
 	// DeviceIot is the client for interacting with the DeviceIot builders.
 	DeviceIot *DeviceIotClient
 	// MainIot is the client for interacting with the MainIot builders.
 	MainIot *MainIotClient
+	// Payment is the client for interacting with the Payment builders.
+	Payment *PaymentClient
+	// Plan is the client for interacting with the Plan builders.
+	Plan *PlanClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserPaymentPlan is the client for interacting with the UserPaymentPlan builders.
+	UserPaymentPlan *UserPaymentPlanClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -46,10 +58,14 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.DeviceDetails = NewDeviceDetailsClient(c.config)
 	c.DeviceIot = NewDeviceIotClient(c.config)
 	c.MainIot = NewMainIotClient(c.config)
+	c.Payment = NewPaymentClient(c.config)
+	c.Plan = NewPlanClient(c.config)
 	c.Role = NewRoleClient(c.config)
 	c.User = NewUserClient(c.config)
+	c.UserPaymentPlan = NewUserPaymentPlanClient(c.config)
 }
 
 type (
@@ -140,12 +156,16 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:       ctx,
-		config:    cfg,
-		DeviceIot: NewDeviceIotClient(cfg),
-		MainIot:   NewMainIotClient(cfg),
-		Role:      NewRoleClient(cfg),
-		User:      NewUserClient(cfg),
+		ctx:             ctx,
+		config:          cfg,
+		DeviceDetails:   NewDeviceDetailsClient(cfg),
+		DeviceIot:       NewDeviceIotClient(cfg),
+		MainIot:         NewMainIotClient(cfg),
+		Payment:         NewPaymentClient(cfg),
+		Plan:            NewPlanClient(cfg),
+		Role:            NewRoleClient(cfg),
+		User:            NewUserClient(cfg),
+		UserPaymentPlan: NewUserPaymentPlanClient(cfg),
 	}, nil
 }
 
@@ -163,19 +183,23 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:       ctx,
-		config:    cfg,
-		DeviceIot: NewDeviceIotClient(cfg),
-		MainIot:   NewMainIotClient(cfg),
-		Role:      NewRoleClient(cfg),
-		User:      NewUserClient(cfg),
+		ctx:             ctx,
+		config:          cfg,
+		DeviceDetails:   NewDeviceDetailsClient(cfg),
+		DeviceIot:       NewDeviceIotClient(cfg),
+		MainIot:         NewMainIotClient(cfg),
+		Payment:         NewPaymentClient(cfg),
+		Plan:            NewPlanClient(cfg),
+		Role:            NewRoleClient(cfg),
+		User:            NewUserClient(cfg),
+		UserPaymentPlan: NewUserPaymentPlanClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		DeviceIot.
+//		DeviceDetails.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -197,34 +221,195 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.DeviceIot.Use(hooks...)
-	c.MainIot.Use(hooks...)
-	c.Role.Use(hooks...)
-	c.User.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.DeviceDetails, c.DeviceIot, c.MainIot, c.Payment, c.Plan, c.Role, c.User,
+		c.UserPaymentPlan,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.DeviceIot.Intercept(interceptors...)
-	c.MainIot.Intercept(interceptors...)
-	c.Role.Intercept(interceptors...)
-	c.User.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.DeviceDetails, c.DeviceIot, c.MainIot, c.Payment, c.Plan, c.Role, c.User,
+		c.UserPaymentPlan,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *DeviceDetailsMutation:
+		return c.DeviceDetails.mutate(ctx, m)
 	case *DeviceIotMutation:
 		return c.DeviceIot.mutate(ctx, m)
 	case *MainIotMutation:
 		return c.MainIot.mutate(ctx, m)
+	case *PaymentMutation:
+		return c.Payment.mutate(ctx, m)
+	case *PlanMutation:
+		return c.Plan.mutate(ctx, m)
 	case *RoleMutation:
 		return c.Role.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
+	case *UserPaymentPlanMutation:
+		return c.UserPaymentPlan.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// DeviceDetailsClient is a client for the DeviceDetails schema.
+type DeviceDetailsClient struct {
+	config
+}
+
+// NewDeviceDetailsClient returns a client for the DeviceDetails from the given config.
+func NewDeviceDetailsClient(c config) *DeviceDetailsClient {
+	return &DeviceDetailsClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `devicedetails.Hooks(f(g(h())))`.
+func (c *DeviceDetailsClient) Use(hooks ...Hook) {
+	c.hooks.DeviceDetails = append(c.hooks.DeviceDetails, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `devicedetails.Intercept(f(g(h())))`.
+func (c *DeviceDetailsClient) Intercept(interceptors ...Interceptor) {
+	c.inters.DeviceDetails = append(c.inters.DeviceDetails, interceptors...)
+}
+
+// Create returns a builder for creating a DeviceDetails entity.
+func (c *DeviceDetailsClient) Create() *DeviceDetailsCreate {
+	mutation := newDeviceDetailsMutation(c.config, OpCreate)
+	return &DeviceDetailsCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DeviceDetails entities.
+func (c *DeviceDetailsClient) CreateBulk(builders ...*DeviceDetailsCreate) *DeviceDetailsCreateBulk {
+	return &DeviceDetailsCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *DeviceDetailsClient) MapCreateBulk(slice any, setFunc func(*DeviceDetailsCreate, int)) *DeviceDetailsCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &DeviceDetailsCreateBulk{err: fmt.Errorf("calling to DeviceDetailsClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*DeviceDetailsCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &DeviceDetailsCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DeviceDetails.
+func (c *DeviceDetailsClient) Update() *DeviceDetailsUpdate {
+	mutation := newDeviceDetailsMutation(c.config, OpUpdate)
+	return &DeviceDetailsUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DeviceDetailsClient) UpdateOne(dd *DeviceDetails) *DeviceDetailsUpdateOne {
+	mutation := newDeviceDetailsMutation(c.config, OpUpdateOne, withDeviceDetails(dd))
+	return &DeviceDetailsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DeviceDetailsClient) UpdateOneID(id int) *DeviceDetailsUpdateOne {
+	mutation := newDeviceDetailsMutation(c.config, OpUpdateOne, withDeviceDetailsID(id))
+	return &DeviceDetailsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DeviceDetails.
+func (c *DeviceDetailsClient) Delete() *DeviceDetailsDelete {
+	mutation := newDeviceDetailsMutation(c.config, OpDelete)
+	return &DeviceDetailsDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DeviceDetailsClient) DeleteOne(dd *DeviceDetails) *DeviceDetailsDeleteOne {
+	return c.DeleteOneID(dd.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *DeviceDetailsClient) DeleteOneID(id int) *DeviceDetailsDeleteOne {
+	builder := c.Delete().Where(devicedetails.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DeviceDetailsDeleteOne{builder}
+}
+
+// Query returns a query builder for DeviceDetails.
+func (c *DeviceDetailsClient) Query() *DeviceDetailsQuery {
+	return &DeviceDetailsQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDeviceDetails},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a DeviceDetails entity by its id.
+func (c *DeviceDetailsClient) Get(ctx context.Context, id int) (*DeviceDetails, error) {
+	return c.Query().Where(devicedetails.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DeviceDetailsClient) GetX(ctx context.Context, id int) *DeviceDetails {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryDeviceiotID queries the deviceiot_id edge of a DeviceDetails.
+func (c *DeviceDetailsClient) QueryDeviceiotID(dd *DeviceDetails) *DeviceIotQuery {
+	query := (&DeviceIotClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := dd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(devicedetails.Table, devicedetails.FieldID, id),
+			sqlgraph.To(deviceiot.Table, deviceiot.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, devicedetails.DeviceiotIDTable, devicedetails.DeviceiotIDColumn),
+		)
+		fromV = sqlgraph.Neighbors(dd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *DeviceDetailsClient) Hooks() []Hook {
+	return c.hooks.DeviceDetails
+}
+
+// Interceptors returns the client interceptors.
+func (c *DeviceDetailsClient) Interceptors() []Interceptor {
+	return c.inters.DeviceDetails
+}
+
+func (c *DeviceDetailsClient) mutate(ctx context.Context, m *DeviceDetailsMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DeviceDetailsCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DeviceDetailsUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DeviceDetailsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DeviceDetailsDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown DeviceDetails mutation op: %q", m.Op())
 	}
 }
 
@@ -336,15 +521,31 @@ func (c *DeviceIotClient) GetX(ctx context.Context, id int64) *DeviceIot {
 	return obj
 }
 
-// QueryOwner queries the owner edge of a DeviceIot.
-func (c *DeviceIotClient) QueryOwner(di *DeviceIot) *MainIotQuery {
+// QueryMainiotID queries the mainiot_id edge of a DeviceIot.
+func (c *DeviceIotClient) QueryMainiotID(di *DeviceIot) *MainIotQuery {
 	query := (&MainIotClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := di.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(deviceiot.Table, deviceiot.FieldID, id),
 			sqlgraph.To(mainiot.Table, mainiot.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, deviceiot.OwnerTable, deviceiot.OwnerColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, deviceiot.MainiotIDTable, deviceiot.MainiotIDColumn),
+		)
+		fromV = sqlgraph.Neighbors(di.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDevicedetails queries the devicedetails edge of a DeviceIot.
+func (c *DeviceIotClient) QueryDevicedetails(di *DeviceIot) *DeviceDetailsQuery {
+	query := (&DeviceDetailsClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := di.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(deviceiot.Table, deviceiot.FieldID, id),
+			sqlgraph.To(devicedetails.Table, devicedetails.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, deviceiot.DevicedetailsTable, deviceiot.DevicedetailsColumn),
 		)
 		fromV = sqlgraph.Neighbors(di.driver.Dialect(), step)
 		return fromV, nil
@@ -501,15 +702,15 @@ func (c *MainIotClient) QueryDeviceiots(mi *MainIot) *DeviceIotQuery {
 	return query
 }
 
-// QueryOwner queries the owner edge of a MainIot.
-func (c *MainIotClient) QueryOwner(mi *MainIot) *UserQuery {
+// QueryUserID queries the user_id edge of a MainIot.
+func (c *MainIotClient) QueryUserID(mi *MainIot) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := mi.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(mainiot.Table, mainiot.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, mainiot.OwnerTable, mainiot.OwnerColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, mainiot.UserIDTable, mainiot.UserIDColumn),
 		)
 		fromV = sqlgraph.Neighbors(mi.driver.Dialect(), step)
 		return fromV, nil
@@ -539,6 +740,288 @@ func (c *MainIotClient) mutate(ctx context.Context, m *MainIotMutation) (Value, 
 		return (&MainIotDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown MainIot mutation op: %q", m.Op())
+	}
+}
+
+// PaymentClient is a client for the Payment schema.
+type PaymentClient struct {
+	config
+}
+
+// NewPaymentClient returns a client for the Payment from the given config.
+func NewPaymentClient(c config) *PaymentClient {
+	return &PaymentClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `payment.Hooks(f(g(h())))`.
+func (c *PaymentClient) Use(hooks ...Hook) {
+	c.hooks.Payment = append(c.hooks.Payment, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `payment.Intercept(f(g(h())))`.
+func (c *PaymentClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Payment = append(c.inters.Payment, interceptors...)
+}
+
+// Create returns a builder for creating a Payment entity.
+func (c *PaymentClient) Create() *PaymentCreate {
+	mutation := newPaymentMutation(c.config, OpCreate)
+	return &PaymentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Payment entities.
+func (c *PaymentClient) CreateBulk(builders ...*PaymentCreate) *PaymentCreateBulk {
+	return &PaymentCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PaymentClient) MapCreateBulk(slice any, setFunc func(*PaymentCreate, int)) *PaymentCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PaymentCreateBulk{err: fmt.Errorf("calling to PaymentClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PaymentCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PaymentCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Payment.
+func (c *PaymentClient) Update() *PaymentUpdate {
+	mutation := newPaymentMutation(c.config, OpUpdate)
+	return &PaymentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PaymentClient) UpdateOne(pa *Payment) *PaymentUpdateOne {
+	mutation := newPaymentMutation(c.config, OpUpdateOne, withPayment(pa))
+	return &PaymentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PaymentClient) UpdateOneID(id int64) *PaymentUpdateOne {
+	mutation := newPaymentMutation(c.config, OpUpdateOne, withPaymentID(id))
+	return &PaymentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Payment.
+func (c *PaymentClient) Delete() *PaymentDelete {
+	mutation := newPaymentMutation(c.config, OpDelete)
+	return &PaymentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PaymentClient) DeleteOne(pa *Payment) *PaymentDeleteOne {
+	return c.DeleteOneID(pa.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PaymentClient) DeleteOneID(id int64) *PaymentDeleteOne {
+	builder := c.Delete().Where(payment.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PaymentDeleteOne{builder}
+}
+
+// Query returns a query builder for Payment.
+func (c *PaymentClient) Query() *PaymentQuery {
+	return &PaymentQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePayment},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Payment entity by its id.
+func (c *PaymentClient) Get(ctx context.Context, id int64) (*Payment, error) {
+	return c.Query().Where(payment.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PaymentClient) GetX(ctx context.Context, id int64) *Payment {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *PaymentClient) Hooks() []Hook {
+	return c.hooks.Payment
+}
+
+// Interceptors returns the client interceptors.
+func (c *PaymentClient) Interceptors() []Interceptor {
+	return c.inters.Payment
+}
+
+func (c *PaymentClient) mutate(ctx context.Context, m *PaymentMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PaymentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PaymentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PaymentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PaymentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Payment mutation op: %q", m.Op())
+	}
+}
+
+// PlanClient is a client for the Plan schema.
+type PlanClient struct {
+	config
+}
+
+// NewPlanClient returns a client for the Plan from the given config.
+func NewPlanClient(c config) *PlanClient {
+	return &PlanClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `plan.Hooks(f(g(h())))`.
+func (c *PlanClient) Use(hooks ...Hook) {
+	c.hooks.Plan = append(c.hooks.Plan, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `plan.Intercept(f(g(h())))`.
+func (c *PlanClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Plan = append(c.inters.Plan, interceptors...)
+}
+
+// Create returns a builder for creating a Plan entity.
+func (c *PlanClient) Create() *PlanCreate {
+	mutation := newPlanMutation(c.config, OpCreate)
+	return &PlanCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Plan entities.
+func (c *PlanClient) CreateBulk(builders ...*PlanCreate) *PlanCreateBulk {
+	return &PlanCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PlanClient) MapCreateBulk(slice any, setFunc func(*PlanCreate, int)) *PlanCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PlanCreateBulk{err: fmt.Errorf("calling to PlanClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PlanCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PlanCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Plan.
+func (c *PlanClient) Update() *PlanUpdate {
+	mutation := newPlanMutation(c.config, OpUpdate)
+	return &PlanUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PlanClient) UpdateOne(pl *Plan) *PlanUpdateOne {
+	mutation := newPlanMutation(c.config, OpUpdateOne, withPlan(pl))
+	return &PlanUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PlanClient) UpdateOneID(id int) *PlanUpdateOne {
+	mutation := newPlanMutation(c.config, OpUpdateOne, withPlanID(id))
+	return &PlanUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Plan.
+func (c *PlanClient) Delete() *PlanDelete {
+	mutation := newPlanMutation(c.config, OpDelete)
+	return &PlanDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PlanClient) DeleteOne(pl *Plan) *PlanDeleteOne {
+	return c.DeleteOneID(pl.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PlanClient) DeleteOneID(id int) *PlanDeleteOne {
+	builder := c.Delete().Where(plan.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PlanDeleteOne{builder}
+}
+
+// Query returns a query builder for Plan.
+func (c *PlanClient) Query() *PlanQuery {
+	return &PlanQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePlan},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Plan entity by its id.
+func (c *PlanClient) Get(ctx context.Context, id int) (*Plan, error) {
+	return c.Query().Where(plan.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PlanClient) GetX(ctx context.Context, id int) *Plan {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUserpaymentplans queries the userpaymentplans edge of a Plan.
+func (c *PlanClient) QueryUserpaymentplans(pl *Plan) *UserPaymentPlanQuery {
+	query := (&UserPaymentPlanClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(plan.Table, plan.FieldID, id),
+			sqlgraph.To(userpaymentplan.Table, userpaymentplan.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, plan.UserpaymentplansTable, plan.UserpaymentplansColumn),
+		)
+		fromV = sqlgraph.Neighbors(pl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PlanClient) Hooks() []Hook {
+	return c.hooks.Plan
+}
+
+// Interceptors returns the client interceptors.
+func (c *PlanClient) Interceptors() []Interceptor {
+	return c.inters.Plan
+}
+
+func (c *PlanClient) mutate(ctx context.Context, m *PlanMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PlanCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PlanUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PlanUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PlanDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Plan mutation op: %q", m.Op())
 	}
 }
 
@@ -831,6 +1314,22 @@ func (c *UserClient) QueryMainiots(u *User) *MainIotQuery {
 	return query
 }
 
+// QueryUserpaymentplans queries the userpaymentplans edge of a User.
+func (c *UserClient) QueryUserpaymentplans(u *User) *UserPaymentPlanQuery {
+	query := (&UserPaymentPlanClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(userpaymentplan.Table, userpaymentplan.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.UserpaymentplansTable, user.UserpaymentplansColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -856,12 +1355,179 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 	}
 }
 
+// UserPaymentPlanClient is a client for the UserPaymentPlan schema.
+type UserPaymentPlanClient struct {
+	config
+}
+
+// NewUserPaymentPlanClient returns a client for the UserPaymentPlan from the given config.
+func NewUserPaymentPlanClient(c config) *UserPaymentPlanClient {
+	return &UserPaymentPlanClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `userpaymentplan.Hooks(f(g(h())))`.
+func (c *UserPaymentPlanClient) Use(hooks ...Hook) {
+	c.hooks.UserPaymentPlan = append(c.hooks.UserPaymentPlan, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `userpaymentplan.Intercept(f(g(h())))`.
+func (c *UserPaymentPlanClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserPaymentPlan = append(c.inters.UserPaymentPlan, interceptors...)
+}
+
+// Create returns a builder for creating a UserPaymentPlan entity.
+func (c *UserPaymentPlanClient) Create() *UserPaymentPlanCreate {
+	mutation := newUserPaymentPlanMutation(c.config, OpCreate)
+	return &UserPaymentPlanCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserPaymentPlan entities.
+func (c *UserPaymentPlanClient) CreateBulk(builders ...*UserPaymentPlanCreate) *UserPaymentPlanCreateBulk {
+	return &UserPaymentPlanCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserPaymentPlanClient) MapCreateBulk(slice any, setFunc func(*UserPaymentPlanCreate, int)) *UserPaymentPlanCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserPaymentPlanCreateBulk{err: fmt.Errorf("calling to UserPaymentPlanClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserPaymentPlanCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserPaymentPlanCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserPaymentPlan.
+func (c *UserPaymentPlanClient) Update() *UserPaymentPlanUpdate {
+	mutation := newUserPaymentPlanMutation(c.config, OpUpdate)
+	return &UserPaymentPlanUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserPaymentPlanClient) UpdateOne(upp *UserPaymentPlan) *UserPaymentPlanUpdateOne {
+	mutation := newUserPaymentPlanMutation(c.config, OpUpdateOne, withUserPaymentPlan(upp))
+	return &UserPaymentPlanUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserPaymentPlanClient) UpdateOneID(id int64) *UserPaymentPlanUpdateOne {
+	mutation := newUserPaymentPlanMutation(c.config, OpUpdateOne, withUserPaymentPlanID(id))
+	return &UserPaymentPlanUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserPaymentPlan.
+func (c *UserPaymentPlanClient) Delete() *UserPaymentPlanDelete {
+	mutation := newUserPaymentPlanMutation(c.config, OpDelete)
+	return &UserPaymentPlanDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UserPaymentPlanClient) DeleteOne(upp *UserPaymentPlan) *UserPaymentPlanDeleteOne {
+	return c.DeleteOneID(upp.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UserPaymentPlanClient) DeleteOneID(id int64) *UserPaymentPlanDeleteOne {
+	builder := c.Delete().Where(userpaymentplan.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserPaymentPlanDeleteOne{builder}
+}
+
+// Query returns a query builder for UserPaymentPlan.
+func (c *UserPaymentPlanClient) Query() *UserPaymentPlanQuery {
+	return &UserPaymentPlanQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserPaymentPlan},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UserPaymentPlan entity by its id.
+func (c *UserPaymentPlanClient) Get(ctx context.Context, id int64) (*UserPaymentPlan, error) {
+	return c.Query().Where(userpaymentplan.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserPaymentPlanClient) GetX(ctx context.Context, id int64) *UserPaymentPlan {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUserID queries the user_id edge of a UserPaymentPlan.
+func (c *UserPaymentPlanClient) QueryUserID(upp *UserPaymentPlan) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := upp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(userpaymentplan.Table, userpaymentplan.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, userpaymentplan.UserIDTable, userpaymentplan.UserIDColumn),
+		)
+		fromV = sqlgraph.Neighbors(upp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPlanID queries the plan_id edge of a UserPaymentPlan.
+func (c *UserPaymentPlanClient) QueryPlanID(upp *UserPaymentPlan) *PlanQuery {
+	query := (&PlanClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := upp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(userpaymentplan.Table, userpaymentplan.FieldID, id),
+			sqlgraph.To(plan.Table, plan.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, userpaymentplan.PlanIDTable, userpaymentplan.PlanIDColumn),
+		)
+		fromV = sqlgraph.Neighbors(upp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *UserPaymentPlanClient) Hooks() []Hook {
+	return c.hooks.UserPaymentPlan
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserPaymentPlanClient) Interceptors() []Interceptor {
+	return c.inters.UserPaymentPlan
+}
+
+func (c *UserPaymentPlanClient) mutate(ctx context.Context, m *UserPaymentPlanMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserPaymentPlanCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserPaymentPlanUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserPaymentPlanUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserPaymentPlanDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserPaymentPlan mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		DeviceIot, MainIot, Role, User []ent.Hook
+		DeviceDetails, DeviceIot, MainIot, Payment, Plan, Role, User,
+		UserPaymentPlan []ent.Hook
 	}
 	inters struct {
-		DeviceIot, MainIot, Role, User []ent.Interceptor
+		DeviceDetails, DeviceIot, MainIot, Payment, Plan, Role, User,
+		UserPaymentPlan []ent.Interceptor
 	}
 )

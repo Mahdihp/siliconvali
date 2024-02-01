@@ -23,8 +23,7 @@ func (Role) Fields() []ent.Field {
 
 func (Role) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("id").
-			Unique(),
+		index.Fields("id").Unique(),
 	}
 }
 

@@ -28,14 +28,18 @@ const (
 	FieldMACAddress = "mac_address"
 	// FieldIPRemote holds the string denoting the ip_remote field in the database.
 	FieldIPRemote = "ip_remote"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
+	// FieldActive holds the string denoting the active field in the database.
+	FieldActive = "active"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// EdgeDeviceiots holds the string denoting the deviceiots edge name in mutations.
 	EdgeDeviceiots = "deviceiots"
-	// EdgeOwner holds the string denoting the owner edge name in mutations.
-	EdgeOwner = "owner"
+	// EdgeUserID holds the string denoting the user_id edge name in mutations.
+	EdgeUserID = "user_id"
 	// Table holds the table name of the mainiot in the database.
 	Table = "main_iots"
 	// DeviceiotsTable is the table that holds the deviceiots relation/edge.
@@ -45,13 +49,13 @@ const (
 	DeviceiotsInverseTable = "device_iots"
 	// DeviceiotsColumn is the table column denoting the deviceiots relation/edge.
 	DeviceiotsColumn = "main_iot_deviceiots"
-	// OwnerTable is the table that holds the owner relation/edge.
-	OwnerTable = "main_iots"
-	// OwnerInverseTable is the table name for the User entity.
+	// UserIDTable is the table that holds the user_id relation/edge.
+	UserIDTable = "main_iots"
+	// UserIDInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
-	OwnerInverseTable = "users"
-	// OwnerColumn is the table column denoting the owner relation/edge.
-	OwnerColumn = "user_mainiots"
+	UserIDInverseTable = "users"
+	// UserIDColumn is the table column denoting the user_id relation/edge.
+	UserIDColumn = "user_mainiots"
 )
 
 // Columns holds all SQL columns for mainiot fields.
@@ -64,6 +68,8 @@ var Columns = []string{
 	FieldSerialNumber,
 	FieldMACAddress,
 	FieldIPRemote,
+	FieldStatus,
+	FieldActive,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -100,6 +106,8 @@ var (
 	MACAddressValidator func(string) error
 	// IPRemoteValidator is a validator for the "ip_remote" field. It is called by the builders before save.
 	IPRemoteValidator func(string) error
+	// DefaultActive holds the default value on creation for the "active" field.
+	DefaultActive bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -149,6 +157,16 @@ func ByIPRemote(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIPRemote, opts...).ToFunc()
 }
 
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByActive orders the results by the active field.
+func ByActive(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldActive, opts...).ToFunc()
+}
+
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
@@ -173,10 +191,10 @@ func ByDeviceiots(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByOwnerField orders the results by owner field.
-func ByOwnerField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByUserIDField orders the results by user_id field.
+func ByUserIDField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newOwnerStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newUserIDStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newDeviceiotsStep() *sqlgraph.Step {
@@ -186,10 +204,10 @@ func newDeviceiotsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, DeviceiotsTable, DeviceiotsColumn),
 	)
 }
-func newOwnerStep() *sqlgraph.Step {
+func newUserIDStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(OwnerInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
+		sqlgraph.To(UserIDInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, UserIDTable, UserIDColumn),
 	)
 }
