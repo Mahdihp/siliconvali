@@ -19,6 +19,7 @@ func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id"),
 		field.String("username").MaxLen(50).Unique(),
+		field.String("password").MaxLen(50),
 		field.String("firstname").MaxLen(100).Optional().Nillable(),
 		field.String("lastname").MaxLen(100).Optional().Nillable(),
 		field.String("mobile").MaxLen(11).Optional(),

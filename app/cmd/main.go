@@ -1,14 +1,10 @@
 package main
 
 import (
-	"entgo.io/ent/dialect"
-	"fmt"
 	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/log"
 	"github.com/gofiber/fiber/v3/middleware/logger"
 	_ "github.com/lib/pq"
 	"siliconvali/config"
-	"siliconvali/ent"
 )
 
 var AppConfig config.AppConfiguration
@@ -19,52 +15,12 @@ func init() {
 }
 func main() {
 
-	InitAndSeedData()
+	//dbClient := postgres.InitAndDataSeeder(AppConfig)
+	//ctx := context.Background()
+	//count, _ := dbClient.Role.Query().Count(ctx)
+	//fmt.Println("Role.Query(): ", count)
 
 	//StartServer()
-}
-
-func InitAndSeedData() {
-
-	//ConnetionString := "postgres://postgres:postgres@localhost:5432/postgres"
-	ConnetionString := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
-		AppConfig.DbConfig.Host, AppConfig.DbConfig.DbPort, AppConfig.DbConfig.Username, AppConfig.DbConfig.DbName, AppConfig.DbConfig.Password)
-
-	//fmt.Println("ConnetionString:", ConnetionString)
-
-	client, err := ent.Open(dialect.Postgres, ConnetionString)
-	if err != nil {
-		log.Fatalf("failed opening connection to postgres: %v", err)
-	}
-	//ctx := context.Background()
-	//if err := client.Schema.Create(ctx); err != nil {
-	//	log.Fatalf("failed creating schema resources: %v", err)
-	//}
-
-	//newRole, errSql := client.Role.Create().
-	//	SetName("ADMIN").
-	//	Save(ctx)
-	//
-
-	//fmt.Println("Role Error", errSql)
-	//fmt.Println("Role Result", newRole)
-
-	//roleFund, err := client.Role.Query().Where(sql.FieldEQ(role.FieldID, 2)).First(ctx)
-	//
-	//a8m, errSql := client.User.Create().
-	//	SetUsername("mahdi3").
-	//	SetFirstname("Mahdi").
-	//	SetLastname("Hosseinpour").
-	//	SetMobile("09339466051").
-	//	//AddRoleIDs(newRole.ID).
-	//	AddRoles(roleFund).
-	//	Save(ctx)
-	//
-	//fmt.Println("Role Found", roleFund)
-	//fmt.Println("User Error", errSql)
-	//fmt.Println("User Result", a8m)
-	//
-	//defer client.Close()
 }
 
 func StartServer() {

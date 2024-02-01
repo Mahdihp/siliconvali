@@ -16,6 +16,8 @@ const (
 	FieldID = "id"
 	// FieldUsername holds the string denoting the username field in the database.
 	FieldUsername = "username"
+	// FieldPassword holds the string denoting the password field in the database.
+	FieldPassword = "password"
 	// FieldFirstname holds the string denoting the firstname field in the database.
 	FieldFirstname = "firstname"
 	// FieldLastname holds the string denoting the lastname field in the database.
@@ -67,6 +69,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldUsername,
+	FieldPassword,
 	FieldFirstname,
 	FieldLastname,
 	FieldMobile,
@@ -97,6 +100,8 @@ func ValidColumn(column string) bool {
 var (
 	// UsernameValidator is a validator for the "username" field. It is called by the builders before save.
 	UsernameValidator func(string) error
+	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
+	PasswordValidator func(string) error
 	// FirstnameValidator is a validator for the "firstname" field. It is called by the builders before save.
 	FirstnameValidator func(string) error
 	// LastnameValidator is a validator for the "lastname" field. It is called by the builders before save.
@@ -128,6 +133,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByUsername orders the results by the username field.
 func ByUsername(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUsername, opts...).ToFunc()
+}
+
+// ByPassword orders the results by the password field.
+func ByPassword(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPassword, opts...).ToFunc()
 }
 
 // ByFirstname orders the results by the firstname field.

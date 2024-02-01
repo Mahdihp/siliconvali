@@ -7,7 +7,7 @@ import (
 
 type AppConfiguration struct {
 	Server          Server
-	DbConfig        Database
+	DbConfig        DbConfig
 	MigrationConfig Migration
 }
 
@@ -15,7 +15,7 @@ type Server struct {
 	Host string
 	Port string
 }
-type Database struct {
+type DbConfig struct {
 	Host     string
 	DbPort   int
 	DbName   string
@@ -40,12 +40,12 @@ func Initialize() AppConfiguration {
 			Host: viper.GetString("Server.Host"),
 			Port: viper.GetString("Server.Port"),
 		},
-		DbConfig: Database{
-			Host:     viper.GetString("Database.Host"),
-			DbName:   viper.GetString("Database.DbName"),
-			DbPort:   viper.GetInt("Database.DbPort"),
-			Username: viper.GetString("Database.Username"),
-			Password: viper.GetString("Database.Password"),
+		DbConfig: DbConfig{
+			Host:     viper.GetString("DbConfig.Host"),
+			DbName:   viper.GetString("DbConfig.DbName"),
+			DbPort:   viper.GetInt("DbConfig.DbPort"),
+			Username: viper.GetString("DbConfig.Username"),
+			Password: viper.GetString("DbConfig.Password"),
 		},
 		MigrationConfig: Migration{
 			MigrationDir:   viper.GetString("Migration.MigrationDir"),
