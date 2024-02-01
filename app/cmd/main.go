@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"entgo.io/ent/dialect"
 	"fmt"
 	"github.com/gofiber/fiber/v3"
@@ -37,7 +36,7 @@ func InitAndSeedData() {
 	if err != nil {
 		log.Fatalf("failed opening connection to postgres: %v", err)
 	}
-	ctx := context.Background()
+	//ctx := context.Background()
 	//if err := client.Schema.Create(ctx); err != nil {
 	//	log.Fatalf("failed creating schema resources: %v", err)
 	//}
@@ -46,6 +45,7 @@ func InitAndSeedData() {
 	//	SetName("ADMIN").
 	//	Save(ctx)
 	//
+
 	//fmt.Println("Role Error", errSql)
 	//fmt.Println("Role Result", newRole)
 
