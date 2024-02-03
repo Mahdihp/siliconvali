@@ -4,11 +4,12 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"siliconvali/dto"
 	"siliconvali/ent"
 )
 
 type Repository interface {
-	Register(u ent.User) (ent.User, error)
+	Register(reqDto dto.RegisterRequest) (ent.User, error)
 	GetUsername(username string) (ent.User, error)
 	GetUserByID(ctx context.Context, userID uint) (ent.User, error)
 }

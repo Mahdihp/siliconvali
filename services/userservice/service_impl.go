@@ -3,7 +3,6 @@ package userservice
 import (
 	"fmt"
 	"siliconvali/dto"
-	"siliconvali/ent"
 	richerror "siliconvali/pkg"
 )
 
@@ -11,8 +10,8 @@ func (s Service) Register(req dto.RegisterRequest) (dto.RegisterResponse, error)
 	// TODO - we should verify phone number by verification code
 
 	// TODO - replace md5 with bcrypt
-	user := ent.User{
-		ID:       0,
+	// TODO - validation Fileds
+	user := dto.RegisterRequest{
 		Username: req.Username,
 		Password: getMD5Hash(req.Password),
 	}
