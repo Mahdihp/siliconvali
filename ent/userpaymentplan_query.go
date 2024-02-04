@@ -128,8 +128,8 @@ func (uppq *UserPaymentPlanQuery) FirstX(ctx context.Context) *UserPaymentPlan {
 	return node
 }
 
-// FirstID returns the first UserPaymentPlan ID from the query.
-// Returns a *NotFoundError when no UserPaymentPlan ID was found.
+// FirstID returns the first UserPaymentPlan Id from the query.
+// Returns a *NotFoundError when no UserPaymentPlan Id was found.
 func (uppq *UserPaymentPlanQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
 	if ids, err = uppq.Limit(1).IDs(setContextOp(ctx, uppq.ctx, "FirstID")); err != nil {
@@ -178,8 +178,8 @@ func (uppq *UserPaymentPlanQuery) OnlyX(ctx context.Context) *UserPaymentPlan {
 	return node
 }
 
-// OnlyID is like Only, but returns the only UserPaymentPlan ID in the query.
-// Returns a *NotSingularError when more than one UserPaymentPlan ID is found.
+// OnlyID is like Only, but returns the only UserPaymentPlan Id in the query.
+// Returns a *NotSingularError when more than one UserPaymentPlan Id is found.
 // Returns a *NotFoundError when no entities are found.
 func (uppq *UserPaymentPlanQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64

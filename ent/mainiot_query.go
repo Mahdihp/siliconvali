@@ -129,8 +129,8 @@ func (miq *MainIotQuery) FirstX(ctx context.Context) *MainIot {
 	return node
 }
 
-// FirstID returns the first MainIot ID from the query.
-// Returns a *NotFoundError when no MainIot ID was found.
+// FirstID returns the first MainIot Id from the query.
+// Returns a *NotFoundError when no MainIot Id was found.
 func (miq *MainIotQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
 	if ids, err = miq.Limit(1).IDs(setContextOp(ctx, miq.ctx, "FirstID")); err != nil {
@@ -179,8 +179,8 @@ func (miq *MainIotQuery) OnlyX(ctx context.Context) *MainIot {
 	return node
 }
 
-// OnlyID is like Only, but returns the only MainIot ID in the query.
-// Returns a *NotSingularError when more than one MainIot ID is found.
+// OnlyID is like Only, but returns the only MainIot Id in the query.
+// Returns a *NotSingularError when more than one MainIot Id is found.
 // Returns a *NotFoundError when no entities are found.
 func (miq *MainIotQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64

@@ -118,7 +118,7 @@ func (uppc *UserPaymentPlanCreate) SetID(i int64) *UserPaymentPlanCreate {
 	return uppc
 }
 
-// SetUserIDID sets the "user_id" edge to the User entity by ID.
+// SetUserIDID sets the "user_id" edge to the User entity by Id.
 func (uppc *UserPaymentPlanCreate) SetUserIDID(id int64) *UserPaymentPlanCreate {
 	uppc.mutation.SetUserIDID(id)
 	return uppc
@@ -129,7 +129,7 @@ func (uppc *UserPaymentPlanCreate) SetUserID(u *User) *UserPaymentPlanCreate {
 	return uppc.SetUserIDID(u.ID)
 }
 
-// SetPlanIDID sets the "plan_id" edge to the Plan entity by ID.
+// SetPlanIDID sets the "plan_id" edge to the Plan entity by Id.
 func (uppc *UserPaymentPlanCreate) SetPlanIDID(id int) *UserPaymentPlanCreate {
 	uppc.mutation.SetPlanIDID(id)
 	return uppc

@@ -48,13 +48,13 @@ func (ddu *DeviceDetailsUpdate) ClearLightStatus() *DeviceDetailsUpdate {
 	return ddu
 }
 
-// SetDeviceiotIDID sets the "deviceiot_id" edge to the DeviceIot entity by ID.
+// SetDeviceiotIDID sets the "deviceiot_id" edge to the DeviceIot entity by Id.
 func (ddu *DeviceDetailsUpdate) SetDeviceiotIDID(id int64) *DeviceDetailsUpdate {
 	ddu.mutation.SetDeviceiotIDID(id)
 	return ddu
 }
 
-// SetNillableDeviceiotIDID sets the "deviceiot_id" edge to the DeviceIot entity by ID if the given value is not nil.
+// SetNillableDeviceiotIDID sets the "deviceiot_id" edge to the DeviceIot entity by Id if the given value is not nil.
 func (ddu *DeviceDetailsUpdate) SetNillableDeviceiotIDID(id *int64) *DeviceDetailsUpdate {
 	if id != nil {
 		ddu = ddu.SetDeviceiotIDID(*id)
@@ -189,13 +189,13 @@ func (dduo *DeviceDetailsUpdateOne) ClearLightStatus() *DeviceDetailsUpdateOne {
 	return dduo
 }
 
-// SetDeviceiotIDID sets the "deviceiot_id" edge to the DeviceIot entity by ID.
+// SetDeviceiotIDID sets the "deviceiot_id" edge to the DeviceIot entity by Id.
 func (dduo *DeviceDetailsUpdateOne) SetDeviceiotIDID(id int64) *DeviceDetailsUpdateOne {
 	dduo.mutation.SetDeviceiotIDID(id)
 	return dduo
 }
 
-// SetNillableDeviceiotIDID sets the "deviceiot_id" edge to the DeviceIot entity by ID if the given value is not nil.
+// SetNillableDeviceiotIDID sets the "deviceiot_id" edge to the DeviceIot entity by Id if the given value is not nil.
 func (dduo *DeviceDetailsUpdateOne) SetNillableDeviceiotIDID(id *int64) *DeviceDetailsUpdateOne {
 	if id != nil {
 		dduo = dduo.SetDeviceiotIDID(*id)

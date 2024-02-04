@@ -193,13 +193,13 @@ func (diu *DeviceIotUpdate) SetNillableUpdatedAt(t *time.Time) *DeviceIotUpdate 
 	return diu
 }
 
-// SetMainiotIDID sets the "mainiot_id" edge to the MainIot entity by ID.
+// SetMainiotIDID sets the "mainiot_id" edge to the MainIot entity by Id.
 func (diu *DeviceIotUpdate) SetMainiotIDID(id int64) *DeviceIotUpdate {
 	diu.mutation.SetMainiotIDID(id)
 	return diu
 }
 
-// SetNillableMainiotIDID sets the "mainiot_id" edge to the MainIot entity by ID if the given value is not nil.
+// SetNillableMainiotIDID sets the "mainiot_id" edge to the MainIot entity by Id if the given value is not nil.
 func (diu *DeviceIotUpdate) SetNillableMainiotIDID(id *int64) *DeviceIotUpdate {
 	if id != nil {
 		diu = diu.SetMainiotIDID(*id)
@@ -618,13 +618,13 @@ func (diuo *DeviceIotUpdateOne) SetNillableUpdatedAt(t *time.Time) *DeviceIotUpd
 	return diuo
 }
 
-// SetMainiotIDID sets the "mainiot_id" edge to the MainIot entity by ID.
+// SetMainiotIDID sets the "mainiot_id" edge to the MainIot entity by Id.
 func (diuo *DeviceIotUpdateOne) SetMainiotIDID(id int64) *DeviceIotUpdateOne {
 	diuo.mutation.SetMainiotIDID(id)
 	return diuo
 }
 
-// SetNillableMainiotIDID sets the "mainiot_id" edge to the MainIot entity by ID if the given value is not nil.
+// SetNillableMainiotIDID sets the "mainiot_id" edge to the MainIot entity by Id if the given value is not nil.
 func (diuo *DeviceIotUpdateOne) SetNillableMainiotIDID(id *int64) *DeviceIotUpdateOne {
 	if id != nil {
 		diuo = diuo.SetMainiotIDID(*id)

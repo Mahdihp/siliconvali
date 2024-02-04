@@ -1,24 +1,38 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/logger"
 	_ "github.com/lib/pq"
 	"siliconvali/config"
+	"siliconvali/repository/postgres"
+	"siliconvali/repository/postgresuser"
+	"siliconvali/services/userservice"
 )
 
 var AppConfig config.AppConfiguration
 
 func init() {
 	AppConfig = config.Initialize()
+
 	//fmt.Println(AppConfig)
 }
 func main() {
 
-	//dbClient := postgres.InitAndDataSeeder(AppConfig)
+	dbClient := postgres.New(AppConfig.DbConfig)
 	//ctx := context.Background()
 	//count, _ := dbClient.Role.Query().Count(ctx)
 	//fmt.Println("Role.Query(): ", count)
+	repositoryImpl := postgresuser.New(dbClient)
+	user, _ := repositoryImpl.GetUserByID(context.Background(), 1)
+	fmt.Println("service --------: ", user)
+
+	service := userservice.New(repositoryImpl)
+
+	username, _ := service.GetByUsername("mahdi", "admin")
+	fmt.Println("service --------: ", username)
 
 	//StartServer()
 }

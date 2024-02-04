@@ -104,8 +104,8 @@ func (rq *RoleQuery) FirstX(ctx context.Context) *Role {
 	return node
 }
 
-// FirstID returns the first Role ID from the query.
-// Returns a *NotFoundError when no Role ID was found.
+// FirstID returns the first Role Id from the query.
+// Returns a *NotFoundError when no Role Id was found.
 func (rq *RoleQuery) FirstID(ctx context.Context) (id int16, err error) {
 	var ids []int16
 	if ids, err = rq.Limit(1).IDs(setContextOp(ctx, rq.ctx, "FirstID")); err != nil {
@@ -154,8 +154,8 @@ func (rq *RoleQuery) OnlyX(ctx context.Context) *Role {
 	return node
 }
 
-// OnlyID is like Only, but returns the only Role ID in the query.
-// Returns a *NotSingularError when more than one Role ID is found.
+// OnlyID is like Only, but returns the only Role Id in the query.
+// Returns a *NotSingularError when more than one Role Id is found.
 // Returns a *NotFoundError when no entities are found.
 func (rq *RoleQuery) OnlyID(ctx context.Context) (id int16, err error) {
 	var ids []int16
