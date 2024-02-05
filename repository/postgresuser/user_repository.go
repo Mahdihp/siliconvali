@@ -3,7 +3,6 @@ package postgresuser
 import (
 	"context"
 	"entgo.io/ent/dialect/sql"
-	"errors"
 	"fmt"
 	"siliconvali/dto"
 	"siliconvali/ent"
@@ -26,13 +25,80 @@ func New(conn *postgres.PostgresqlDB) *UserRepositoryImpl {
 }
 
 type UserRepository interface {
-	Insert(req dto.InsertRequest, ctx context.Context) (ent.User, error)
-	Update(req dto.UpdateRequest, ctx context.Context) (dto.UserInfo, error)
-	GetByUsername(ctx context.Context, username string) (ent.User, error)
-	GetUserByID(ctx context.Context, userId int64) (ent.User, error)
+	Insert(ctx context.Context, req dto.InsertRequest) (dto.UserInfo, error)
+	Update(ctx context.Context, req dto.UpdateRequest) error
+	DeleteById(ctx context.Context, userId int64) error
+	GetByUsername(ctx context.Context, username string) (dto.UserInfo, error)
+	GetById(ctx context.Context, userId int64) (dto.UserInfo, error)
+	GetAll(ctx context.Context, req dto.GetAllRequest) ([]dto.UserInfo, error)
 }
 
-func (userRepo *UserRepositoryImpl) Insert(u dto.InsertRequest, ctx context.Context) (ent.User, error) {
+func (userRepo *UserRepositoryImpl) DeleteById(ctx context.Context, userId int64) error {
+	const op = "postgresuser.DeleteById"
+
+	userFound, err := userRepo.conn.Conn().User.Query().
+		Where(user.And(sql.FieldEQ(user.FieldID, userId), sql.FieldEQ(user.FieldDeleted, false))).
+		First(ctx)
+
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return richerror.New(op).WithErr(err).
+				WithMessage(errmsg.ErrorMsgNotFound).WithKind(richerror.KindNotFound)
+		}
+		//var not *ent.NotFoundError
+		//if errors.As(err, &not) {
+		//
+		//}
+
+		return richerror.New(op).WithErr(err).
+			WithMessage(errmsg.ErrorMsgCantScanQueryResult).WithKind(richerror.KindUnexpected)
+	}
+	_, errDelete := userFound.Update().SetDeleted(true).Save(ctx)
+	return errDelete
+}
+
+func (userRepo *UserRepositoryImpl) GetById(ctx context.Context, userId int64) (dto.UserInfo, error) {
+	const op = "postgresuser.GetById"
+
+	userFound, err := userRepo.conn.Conn().User.Query().
+		Where(sql.FieldEQ(user.FieldID, userId)).
+		First(ctx)
+
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return dto.UserInfo{}, richerror.New(op).WithErr(err).
+				WithMessage(errmsg.ErrorMsgNotFound).WithKind(richerror.KindNotFound)
+		}
+
+		return dto.UserInfo{}, richerror.New(op).WithErr(err).
+			WithMessage(errmsg.ErrorMsgCantScanQueryResult).WithKind(richerror.KindUnexpected)
+	}
+	return UserToUserInfo(userFound), nil
+}
+
+func (userRepo *UserRepositoryImpl) GetAll(ctx context.Context, req dto.GetAllRequest) ([]dto.UserInfo, error) {
+	const op = "postgresuser.GetAll"
+
+	users, err := userRepo.conn.Conn().User.Query().
+		Order(ent.Desc(user.FieldCreatedAt)).
+		Limit(req.PageSize).
+		Offset(req.PageIndex).
+		All(ctx)
+
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return []dto.UserInfo{}, richerror.New(op).WithErr(err).
+				WithMessage(errmsg.ErrorMsgNotFound).WithKind(richerror.KindNotFound)
+		}
+
+		return []dto.UserInfo{}, richerror.New(op).WithErr(err).
+			WithMessage(errmsg.ErrorMsgCantScanQueryResult).WithKind(richerror.KindUnexpected)
+	}
+
+	return UsersToUserInfos(users), nil
+}
+
+func (userRepo *UserRepositoryImpl) Insert(ctx context.Context, u dto.InsertRequest) (dto.UserInfo, error) {
 
 	newUser, err := userRepo.conn.Conn().User.Create().
 		SetUsername(u.Username).
@@ -43,13 +109,13 @@ func (userRepo *UserRepositoryImpl) Insert(u dto.InsertRequest, ctx context.Cont
 		SetAddress(u.Address).SetActive(false).Save(ctx)
 
 	if err != nil {
-		return ent.User{}, fmt.Errorf("can't execute command: %w", err)
+		return dto.UserInfo{}, fmt.Errorf("can't execute command: %w", err)
 	}
 
-	return *newUser, nil
+	return UserToUserInfo(newUser), nil
 }
 
-func (userRepo *UserRepositoryImpl) GetByUsername(ctx context.Context, username string) (ent.User, error) {
+func (userRepo *UserRepositoryImpl) GetByUsername(ctx context.Context, username string) (dto.UserInfo, error) {
 	const op = "postgresuser.GetByUsername"
 
 	userFound, err := userRepo.conn.Conn().User.Query().
@@ -57,48 +123,7 @@ func (userRepo *UserRepositoryImpl) GetByUsername(ctx context.Context, username 
 		First(ctx)
 
 	if err != nil {
-		var not *ent.NotFoundError
-		if errors.As(err, &not) {
-			return ent.User{}, richerror.New(op).WithErr(err).
-				WithMessage(errmsg.ErrorMsgNotFound).WithKind(richerror.KindNotFound)
-		}
-
-		return ent.User{}, richerror.New(op).WithErr(err).
-			WithMessage(errmsg.ErrorMsgCantScanQueryResult).WithKind(richerror.KindUnexpected)
-	}
-	return *userFound, nil
-}
-
-func (userRepo *UserRepositoryImpl) GetUserByID(ctx context.Context, userId int64) (ent.User, error) {
-	const op = "postgresuser.GetUserByID"
-
-	userFound, err := userRepo.conn.Conn().User.Query().
-		Where(sql.FieldEQ(user.FieldID, userId)).
-		First(ctx)
-
-	if err != nil {
-		var not *ent.NotFoundError
-		if errors.As(err, &not) {
-			return ent.User{}, richerror.New(op).WithErr(err).
-				WithMessage(errmsg.ErrorMsgNotFound).WithKind(richerror.KindNotFound)
-		}
-
-		return ent.User{}, richerror.New(op).WithErr(err).
-			WithMessage(errmsg.ErrorMsgCantScanQueryResult).WithKind(richerror.KindUnexpected)
-	}
-	return *userFound, nil
-}
-
-func (userRepo UserRepositoryImpl) Update(req dto.UpdateRequest, ctx context.Context) (dto.UserInfo, error) {
-	const op = "postgresuser.Update"
-
-	userFound, err := userRepo.conn.Conn().User.Query().
-		Where(sql.FieldEQ(user.FieldID, req.UserId)).
-		First(ctx)
-
-	if err != nil {
-		var not *ent.NotFoundError
-		if errors.As(err, &not) {
+		if ent.IsNotFound(err) {
 			return dto.UserInfo{}, richerror.New(op).WithErr(err).
 				WithMessage(errmsg.ErrorMsgNotFound).WithKind(richerror.KindNotFound)
 		}
@@ -106,8 +131,27 @@ func (userRepo UserRepositoryImpl) Update(req dto.UpdateRequest, ctx context.Con
 		return dto.UserInfo{}, richerror.New(op).WithErr(err).
 			WithMessage(errmsg.ErrorMsgCantScanQueryResult).WithKind(richerror.KindUnexpected)
 	}
+	return UserToUserInfo(userFound), nil
+}
 
-	save, _ := userFound.Update().SetUsername(req.Username).
+func (userRepo UserRepositoryImpl) Update(ctx context.Context, req dto.UpdateRequest) error {
+	const op = "postgresuser.Update"
+
+	userFound, err := userRepo.conn.Conn().User.Query().
+		Where(sql.FieldEQ(user.FieldID, req.UserId)).
+		First(ctx)
+
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return richerror.New(op).WithErr(err).
+				WithMessage(errmsg.ErrorMsgNotFound).WithKind(richerror.KindNotFound)
+		}
+
+		return richerror.New(op).WithErr(err).
+			WithMessage(errmsg.ErrorMsgCantScanQueryResult).WithKind(richerror.KindUnexpected)
+	}
+
+	_, errUpdate := userFound.Update().SetUsername(req.Username).
 		SetFirstname(req.FirstName).
 		SetLastname(req.LastName).
 		SetNationalCode(req.NationalCode).
@@ -116,17 +160,33 @@ func (userRepo UserRepositoryImpl) Update(req dto.UpdateRequest, ctx context.Con
 		SetMobile(req.Mobile).
 		Save(ctx)
 
-	return UserToUserInfo(save), nil
+	return errUpdate
+}
+
+func UsersToUserInfos(users []*ent.User) []dto.UserInfo {
+	var userInfos []dto.UserInfo
+	for _, u := range users {
+		userInfos = append(userInfos, UserToUserInfo(u))
+	}
+	return userInfos
 }
 func UserToUserInfo(user *ent.User) dto.UserInfo {
-	return dto.UserInfo{
+	userInfo := dto.UserInfo{
 		Id:           user.ID,
 		Username:     user.Username,
-		FirstName:    *user.Firstname,
-		LastName:     *user.Lastname,
 		NationalCode: user.NationalCode,
 		Mobile:       user.Mobile,
-		Address:      *user.Address,
 		Active:       user.Active,
+		Deleted:      user.Deleted,
 	}
+	if user.Address != nil {
+		userInfo.Address = *user.Address
+	}
+	if user.Firstname != nil {
+		userInfo.FirstName = *user.Firstname
+	}
+	if user.Lastname != nil {
+		userInfo.LastName = *user.Lastname
+	}
+	return userInfo
 }

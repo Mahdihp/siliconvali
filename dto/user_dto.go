@@ -22,7 +22,13 @@ type UserInfo struct {
 	Mobile       string `json:"mobile"`
 	NationalCode string `json:"national_code"`
 	Active       bool   `json:"active"`
+	Deleted      bool   `json:"deleted"`
 	Address      string `json:"address"`
+}
+
+type GetAllRequest struct {
+	PageIndex int `json:"page_index"`
+	PageSize  int `json:"page_size"`
 }
 
 type UpdateRequest struct {
