@@ -5,14 +5,14 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"siliconvali/ent"
-	"siliconvali/repository/postgresuser"
+	"siliconvali/repository/user_repository"
 )
 
 type UserService struct {
-	repo postgresuser.UserRepository
+	repo user_repository.UserRepository
 }
 
-func New(repo postgresuser.UserRepository) UserService {
+func New(repo user_repository.UserRepository) UserService {
 	return UserService{repo: repo}
 }
 

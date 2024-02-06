@@ -9,7 +9,7 @@ import (
 	"siliconvali/config"
 	"siliconvali/dto"
 	"siliconvali/repository/postgres"
-	"siliconvali/repository/postgresuser"
+	"siliconvali/repository/user_repository"
 )
 
 var AppConfig config.AppConfiguration
@@ -25,7 +25,7 @@ func main() {
 	//ctx := context.Background()
 	//count, _ := dbClient.Role.Query().Count(ctx)
 	//fmt.Println("Role.Query(): ", count)
-	repositoryImpl := postgresuser.New(dbClient)
+	repositoryImpl := user_repository.New(dbClient)
 	user, _ := repositoryImpl.GetAll(context.Background(), dto.GetAllRequest{PageIndex: 1, PageSize: 2})
 	fmt.Printf("service --------: %+v \n", user)
 
