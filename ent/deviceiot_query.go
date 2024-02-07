@@ -129,8 +129,8 @@ func (diq *DeviceIotQuery) FirstX(ctx context.Context) *DeviceIot {
 	return node
 }
 
-// FirstID returns the first DeviceIot Id from the query.
-// Returns a *NotFoundError when no DeviceIot Id was found.
+// FirstID returns the first DeviceIot UserId from the query.
+// Returns a *NotFoundError when no DeviceIot UserId was found.
 func (diq *DeviceIotQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
 	if ids, err = diq.Limit(1).IDs(setContextOp(ctx, diq.ctx, "FirstID")); err != nil {
@@ -179,8 +179,8 @@ func (diq *DeviceIotQuery) OnlyX(ctx context.Context) *DeviceIot {
 	return node
 }
 
-// OnlyID is like Only, but returns the only DeviceIot Id in the query.
-// Returns a *NotSingularError when more than one DeviceIot Id is found.
+// OnlyID is like Only, but returns the only DeviceIot UserId in the query.
+// Returns a *NotSingularError when more than one DeviceIot UserId is found.
 // Returns a *NotFoundError when no entities are found.
 func (diq *DeviceIotQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64

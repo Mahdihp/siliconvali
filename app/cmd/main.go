@@ -26,7 +26,7 @@ func main() {
 	//count, _ := dbClient.Role.Query().Count(ctx)
 	//fmt.Println("Role.Query(): ", count)
 	repositoryImpl := user_repository.New(dbClient)
-	user, _ := repositoryImpl.GetAll(context.Background(), dto.GetAllRequest{PageIndex: 1, PageSize: 2})
+	user, _ := repositoryImpl.GetAll(context.Background(), dto.UserGetAllRequest{PageIndex: 1, PageSize: 2})
 	fmt.Printf("service --------: %+v \n", user)
 
 	//service := userservice.New(repositoryImpl)

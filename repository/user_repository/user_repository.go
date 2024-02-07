@@ -25,12 +25,12 @@ func New(conn *postgres.PostgresqlDB) *UserRepositoryImpl {
 }
 
 type UserRepository interface {
-	Insert(ctx context.Context, req dto.InsertRequest) (dto.UserInfo, error)
-	Update(ctx context.Context, req dto.UpdateRequest) error
+	Insert(ctx context.Context, req dto.UserInsertRequest) (dto.UserInfo, error)
+	Update(ctx context.Context, req dto.UserUpdateRequest) error
 	DeleteById(ctx context.Context, userId int64) error
 	GetByUsername(ctx context.Context, username string) (dto.UserInfo, error)
 	GetById(ctx context.Context, userId int64) (dto.UserInfo, error)
-	GetAll(ctx context.Context, req dto.GetAllRequest) ([]dto.UserInfo, error)
+	GetAll(ctx context.Context, req dto.UserGetAllRequest) ([]dto.UserInfo, error)
 }
 
 func (userRepo *UserRepositoryImpl) DeleteById(ctx context.Context, userId int64) error {
@@ -76,7 +76,7 @@ func (userRepo *UserRepositoryImpl) GetById(ctx context.Context, userId int64) (
 	return UserToUserInfo(userFound), nil
 }
 
-func (userRepo *UserRepositoryImpl) GetAll(ctx context.Context, req dto.GetAllRequest) ([]dto.UserInfo, error) {
+func (userRepo *UserRepositoryImpl) GetAll(ctx context.Context, req dto.UserGetAllRequest) ([]dto.UserInfo, error) {
 	const op = "postgresuser.GetAll"
 
 	users, err := userRepo.conn.Conn().User.Query().
@@ -98,7 +98,7 @@ func (userRepo *UserRepositoryImpl) GetAll(ctx context.Context, req dto.GetAllRe
 	return UsersToUserInfos(users), nil
 }
 
-func (userRepo *UserRepositoryImpl) Insert(ctx context.Context, u dto.InsertRequest) (dto.UserInfo, error) {
+func (userRepo *UserRepositoryImpl) Insert(ctx context.Context, u dto.UserInsertRequest) (dto.UserInfo, error) {
 
 	newUser, err := userRepo.conn.Conn().User.Create().
 		SetUsername(u.Username).
@@ -134,7 +134,7 @@ func (userRepo *UserRepositoryImpl) GetByUsername(ctx context.Context, username 
 	return UserToUserInfo(userFound), nil
 }
 
-func (userRepo UserRepositoryImpl) Update(ctx context.Context, req dto.UpdateRequest) error {
+func (userRepo UserRepositoryImpl) Update(ctx context.Context, req dto.UserUpdateRequest) error {
 	const op = "postgresuser.Update"
 
 	userFound, err := userRepo.conn.Conn().User.Query().
@@ -172,7 +172,7 @@ func UsersToUserInfos(users []*ent.User) []dto.UserInfo {
 }
 func UserToUserInfo(user *ent.User) dto.UserInfo {
 	userInfo := dto.UserInfo{
-		Id:           user.ID,
+		UserId:       user.ID,
 		Username:     user.Username,
 		NationalCode: user.NationalCode,
 		Mobile:       user.Mobile,

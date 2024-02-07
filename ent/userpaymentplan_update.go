@@ -144,7 +144,7 @@ func (uppu *UserPaymentPlanUpdate) SetNillableDeleted(b *bool) *UserPaymentPlanU
 	return uppu
 }
 
-// SetUserIDID sets the "user_id" edge to the User entity by Id.
+// SetUserIDID sets the "user_id" edge to the User entity by UserId.
 func (uppu *UserPaymentPlanUpdate) SetUserIDID(id int64) *UserPaymentPlanUpdate {
 	uppu.mutation.SetUserIDID(id)
 	return uppu
@@ -155,7 +155,7 @@ func (uppu *UserPaymentPlanUpdate) SetUserID(u *User) *UserPaymentPlanUpdate {
 	return uppu.SetUserIDID(u.ID)
 }
 
-// SetPlanIDID sets the "plan_id" edge to the Plan entity by Id.
+// SetPlanIDID sets the "plan_id" edge to the Plan entity by UserId.
 func (uppu *UserPaymentPlanUpdate) SetPlanIDID(id int) *UserPaymentPlanUpdate {
 	uppu.mutation.SetPlanIDID(id)
 	return uppu
@@ -459,7 +459,7 @@ func (uppuo *UserPaymentPlanUpdateOne) SetNillableDeleted(b *bool) *UserPaymentP
 	return uppuo
 }
 
-// SetUserIDID sets the "user_id" edge to the User entity by Id.
+// SetUserIDID sets the "user_id" edge to the User entity by UserId.
 func (uppuo *UserPaymentPlanUpdateOne) SetUserIDID(id int64) *UserPaymentPlanUpdateOne {
 	uppuo.mutation.SetUserIDID(id)
 	return uppuo
@@ -470,7 +470,7 @@ func (uppuo *UserPaymentPlanUpdateOne) SetUserID(u *User) *UserPaymentPlanUpdate
 	return uppuo.SetUserIDID(u.ID)
 }
 
-// SetPlanIDID sets the "plan_id" edge to the Plan entity by Id.
+// SetPlanIDID sets the "plan_id" edge to the Plan entity by UserId.
 func (uppuo *UserPaymentPlanUpdateOne) SetPlanIDID(id int) *UserPaymentPlanUpdateOne {
 	uppuo.mutation.SetPlanIDID(id)
 	return uppuo

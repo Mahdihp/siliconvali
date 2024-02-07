@@ -146,13 +146,13 @@ func (dic *DeviceIotCreate) SetID(i int64) *DeviceIotCreate {
 	return dic
 }
 
-// SetMainiotIDID sets the "mainiot_id" edge to the MainIot entity by Id.
+// SetMainiotIDID sets the "mainiot_id" edge to the MainIot entity by UserId.
 func (dic *DeviceIotCreate) SetMainiotIDID(id int64) *DeviceIotCreate {
 	dic.mutation.SetMainiotIDID(id)
 	return dic
 }
 
-// SetNillableMainiotIDID sets the "mainiot_id" edge to the MainIot entity by Id if the given value is not nil.
+// SetNillableMainiotIDID sets the "mainiot_id" edge to the MainIot entity by UserId if the given value is not nil.
 func (dic *DeviceIotCreate) SetNillableMainiotIDID(id *int64) *DeviceIotCreate {
 	if id != nil {
 		dic = dic.SetMainiotIDID(*id)

@@ -79,8 +79,8 @@ func (pq *PaymentQuery) FirstX(ctx context.Context) *Payment {
 	return node
 }
 
-// FirstID returns the first Payment Id from the query.
-// Returns a *NotFoundError when no Payment Id was found.
+// FirstID returns the first Payment UserId from the query.
+// Returns a *NotFoundError when no Payment UserId was found.
 func (pq *PaymentQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
 	if ids, err = pq.Limit(1).IDs(setContextOp(ctx, pq.ctx, "FirstID")); err != nil {
@@ -129,8 +129,8 @@ func (pq *PaymentQuery) OnlyX(ctx context.Context) *Payment {
 	return node
 }
 
-// OnlyID is like Only, but returns the only Payment Id in the query.
-// Returns a *NotSingularError when more than one Payment Id is found.
+// OnlyID is like Only, but returns the only Payment UserId in the query.
+// Returns a *NotSingularError when more than one Payment UserId is found.
 // Returns a *NotFoundError when no entities are found.
 func (pq *PaymentQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64

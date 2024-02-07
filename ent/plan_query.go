@@ -104,8 +104,8 @@ func (pq *PlanQuery) FirstX(ctx context.Context) *Plan {
 	return node
 }
 
-// FirstID returns the first Plan Id from the query.
-// Returns a *NotFoundError when no Plan Id was found.
+// FirstID returns the first Plan UserId from the query.
+// Returns a *NotFoundError when no Plan UserId was found.
 func (pq *PlanQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = pq.Limit(1).IDs(setContextOp(ctx, pq.ctx, "FirstID")); err != nil {
@@ -154,8 +154,8 @@ func (pq *PlanQuery) OnlyX(ctx context.Context) *Plan {
 	return node
 }
 
-// OnlyID is like Only, but returns the only Plan Id in the query.
-// Returns a *NotSingularError when more than one Plan Id is found.
+// OnlyID is like Only, but returns the only Plan UserId in the query.
+// Returns a *NotSingularError when more than one Plan UserId is found.
 // Returns a *NotFoundError when no entities are found.
 func (pq *PlanQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
