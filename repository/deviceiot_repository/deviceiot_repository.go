@@ -21,5 +21,5 @@ type DeviceIotRepository interface {
 	Update(ctx context.Context, req dto.DeviceIotUpdateRequest) error
 	DeleteById(ctx context.Context, deviceiotId int64) error
 	GetById(ctx context.Context, deviceiotId int64) (dto.DeviceIotInfo, error)
-	GetAll(ctx context.Context, req dto.DeviceIotGetAllRequest) ([]dto.DeviceIotInfo, error)
+	GetAll(ctx context.Context, req dto.GetAllDeviceIotRequest) ([]dto.DeviceIotInfo, error)
 }

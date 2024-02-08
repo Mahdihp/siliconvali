@@ -2,7 +2,7 @@ package dto
 
 import "time"
 
-type DeviceIotInfo struct {
+type DeviceDetailsInfo struct {
 	DisplayName  string    `json:"display_name"`
 	SerialNumber string    `json:"serial_number"`
 	TypeDevice   int       `json:"type_device"`
@@ -13,16 +13,16 @@ type DeviceIotInfo struct {
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
-type GetAllDeviceIotRequest struct {
-	PageIndex int   `json:"page_index"`
-	PageSize  int   `json:"page_size"`
-	MainIotId int64 `json:"mainiot_id"`
+type GetAllDeviceDetailsRequest struct {
+	PageIndex       int   `json:"page_index"`
+	PageSize        int   `json:"page_size"`
+	DeviceDetailsId int64 `json:"devicedetails_id"`
 }
-type DeviceIotUpdateRequest struct {
+type DeviceDetailsUpdateRequest struct {
 }
-type DeviceIotInsertRequest struct {
+type DeviceDetailsInsertRequest struct {
 }
 
-type DeviceIotRegisterResponse struct {
-	DeviceIot DeviceIotInfo `json:"deviceiot"`
+type DeviceDetailsRegisterResponse struct {
+	DeviceDetails DeviceDetailsInfo `json:"devicedetails"`
 }
