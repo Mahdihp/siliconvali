@@ -1,20 +1,19 @@
 package dto
 
 type UserInsertRequest struct {
-	Username     string `json:"username"`
+	Mobile       string `json:"mobile"`
 	Password     string `json:"password"`
 	FirstName    string `json:"first_name"`
 	LastName     string `json:"last_name"`
-	Mobile       string `json:"mobile"`
 	NationalCode string `json:"national_code"`
 	Address      string `json:"address"`
 }
-type UserRegisterResponse struct {
+type UserInsertResponse struct {
 	User UserInfo `json:"user"`
 }
 
 type LoginRequest struct {
-	Username string `json:"username"`
+	Mobile   string `json:"mobile"`
 	Password string `json:"password"`
 }
 
@@ -29,10 +28,9 @@ type Tokens struct {
 
 type UserInfo struct {
 	UserId       int64  `json:"user_id"`
-	Username     string `json:"username"`
+	Mobile       string `json:"mobile"`
 	FirstName    string `json:"first_name"`
 	LastName     string `json:"last_name"`
-	Mobile       string `json:"mobile"`
 	NationalCode string `json:"national_code"`
 	Active       bool   `json:"active"`
 	Deleted      bool   `json:"deleted"`
@@ -46,11 +44,10 @@ type GetAllUserRequest struct {
 
 type UserUpdateRequest struct {
 	UserId       int64  `json:"user_id"`
-	Username     string `json:"username"`
+	Mobile       string `json:"mobile"`
 	Password     string `json:"password"`
 	FirstName    string `json:"first_name"`
 	LastName     string `json:"last_name"`
-	Mobile       string `json:"mobile"`
 	NationalCode string `json:"national_code"`
 	Address      string `json:"address"`
 }

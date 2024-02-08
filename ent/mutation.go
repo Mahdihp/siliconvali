@@ -74,7 +74,7 @@ func newDeviceDetailsMutation(c config, op Op, opts ...devicedetailsOption) *Dev
 	return m
 }
 
-// withDeviceDetailsID sets the UserId field of the mutation.
+// withDeviceDetailsID sets the ID field of the mutation.
 func withDeviceDetailsID(id int) devicedetailsOption {
 	return func(m *DeviceDetailsMutation) {
 		var (
@@ -181,7 +181,7 @@ func (m *DeviceDetailsMutation) OldLightStatus(ctx context.Context) (v *bool, er
 		return v, errors.New("OldLightStatus is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLightStatus requires an UserId field in the mutation")
+		return v, errors.New("OldLightStatus requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -509,7 +509,7 @@ func newDeviceIotMutation(c config, op Op, opts ...deviceiotOption) *DeviceIotMu
 	return m
 }
 
-// withDeviceIotID sets the UserId field of the mutation.
+// withDeviceIotID sets the ID field of the mutation.
 func withDeviceIotID(id int64) deviceiotOption {
 	return func(m *DeviceIotMutation) {
 		var (
@@ -616,7 +616,7 @@ func (m *DeviceIotMutation) OldDisplayName(ctx context.Context) (v string, err e
 		return v, errors.New("OldDisplayName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDisplayName requires an UserId field in the mutation")
+		return v, errors.New("OldDisplayName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -652,7 +652,7 @@ func (m *DeviceIotMutation) OldSerialNumber(ctx context.Context) (v *string, err
 		return v, errors.New("OldSerialNumber is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSerialNumber requires an UserId field in the mutation")
+		return v, errors.New("OldSerialNumber requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -702,7 +702,7 @@ func (m *DeviceIotMutation) OldTypeDevice(ctx context.Context) (v *int, err erro
 		return v, errors.New("OldTypeDevice is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTypeDevice requires an UserId field in the mutation")
+		return v, errors.New("OldTypeDevice requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -771,7 +771,7 @@ func (m *DeviceIotMutation) OldStatus(ctx context.Context) (v *string, err error
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStatus requires an UserId field in the mutation")
+		return v, errors.New("OldStatus requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -820,7 +820,7 @@ func (m *DeviceIotMutation) OldActive(ctx context.Context) (v bool, err error) {
 		return v, errors.New("OldActive is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldActive requires an UserId field in the mutation")
+		return v, errors.New("OldActive requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -857,7 +857,7 @@ func (m *DeviceIotMutation) OldLat(ctx context.Context) (v *float64, err error) 
 		return v, errors.New("OldLat is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLat requires an UserId field in the mutation")
+		return v, errors.New("OldLat requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -927,7 +927,7 @@ func (m *DeviceIotMutation) OldLon(ctx context.Context) (v *float64, err error) 
 		return v, errors.New("OldLon is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLon requires an UserId field in the mutation")
+		return v, errors.New("OldLon requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -996,7 +996,7 @@ func (m *DeviceIotMutation) OldCreatedAt(ctx context.Context) (v time.Time, err 
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an UserId field in the mutation")
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -1032,7 +1032,7 @@ func (m *DeviceIotMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err 
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an UserId field in the mutation")
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -1629,7 +1629,7 @@ func newMainIotMutation(c config, op Op, opts ...mainiotOption) *MainIotMutation
 	return m
 }
 
-// withMainIotID sets the UserId field of the mutation.
+// withMainIotID sets the ID field of the mutation.
 func withMainIotID(id int64) mainiotOption {
 	return func(m *MainIotMutation) {
 		var (
@@ -1736,7 +1736,7 @@ func (m *MainIotMutation) OldDisplayName(ctx context.Context) (v string, err err
 		return v, errors.New("OldDisplayName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDisplayName requires an UserId field in the mutation")
+		return v, errors.New("OldDisplayName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -1773,7 +1773,7 @@ func (m *MainIotMutation) OldLat(ctx context.Context) (v *float64, err error) {
 		return v, errors.New("OldLat is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLat requires an UserId field in the mutation")
+		return v, errors.New("OldLat requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -1843,7 +1843,7 @@ func (m *MainIotMutation) OldLon(ctx context.Context) (v *float64, err error) {
 		return v, errors.New("OldLon is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLon requires an UserId field in the mutation")
+		return v, errors.New("OldLon requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -1912,7 +1912,7 @@ func (m *MainIotMutation) OldAddress(ctx context.Context) (v *string, err error)
 		return v, errors.New("OldAddress is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAddress requires an UserId field in the mutation")
+		return v, errors.New("OldAddress requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -1961,7 +1961,7 @@ func (m *MainIotMutation) OldSerialNumber(ctx context.Context) (v *string, err e
 		return v, errors.New("OldSerialNumber is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSerialNumber requires an UserId field in the mutation")
+		return v, errors.New("OldSerialNumber requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -2010,7 +2010,7 @@ func (m *MainIotMutation) OldMACAddress(ctx context.Context) (v *string, err err
 		return v, errors.New("OldMACAddress is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldMACAddress requires an UserId field in the mutation")
+		return v, errors.New("OldMACAddress requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -2059,7 +2059,7 @@ func (m *MainIotMutation) OldIPRemote(ctx context.Context) (v *string, err error
 		return v, errors.New("OldIPRemote is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIPRemote requires an UserId field in the mutation")
+		return v, errors.New("OldIPRemote requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -2108,7 +2108,7 @@ func (m *MainIotMutation) OldStatus(ctx context.Context) (v *string, err error) 
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStatus requires an UserId field in the mutation")
+		return v, errors.New("OldStatus requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -2157,7 +2157,7 @@ func (m *MainIotMutation) OldActive(ctx context.Context) (v bool, err error) {
 		return v, errors.New("OldActive is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldActive requires an UserId field in the mutation")
+		return v, errors.New("OldActive requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -2193,7 +2193,7 @@ func (m *MainIotMutation) OldCreatedAt(ctx context.Context) (v time.Time, err er
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an UserId field in the mutation")
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -2229,7 +2229,7 @@ func (m *MainIotMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err er
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an UserId field in the mutation")
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -2842,7 +2842,7 @@ func newPaymentMutation(c config, op Op, opts ...paymentOption) *PaymentMutation
 	return m
 }
 
-// withPaymentID sets the UserId field of the mutation.
+// withPaymentID sets the ID field of the mutation.
 func withPaymentID(id int64) paymentOption {
 	return func(m *PaymentMutation) {
 		var (
@@ -3122,7 +3122,7 @@ func newPlanMutation(c config, op Op, opts ...planOption) *PlanMutation {
 	return m
 }
 
-// withPlanID sets the UserId field of the mutation.
+// withPlanID sets the ID field of the mutation.
 func withPlanID(id int) planOption {
 	return func(m *PlanMutation) {
 		var (
@@ -3229,7 +3229,7 @@ func (m *PlanMutation) OldName(ctx context.Context) (v string, err error) {
 		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldName requires an UserId field in the mutation")
+		return v, errors.New("OldName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -3266,7 +3266,7 @@ func (m *PlanMutation) OldPrice(ctx context.Context) (v *int64, err error) {
 		return v, errors.New("OldPrice is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPrice requires an UserId field in the mutation")
+		return v, errors.New("OldPrice requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -3336,7 +3336,7 @@ func (m *PlanMutation) OldPeriod(ctx context.Context) (v *int, err error) {
 		return v, errors.New("OldPeriod is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPeriod requires an UserId field in the mutation")
+		return v, errors.New("OldPeriod requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -3405,7 +3405,7 @@ func (m *PlanMutation) OldActive(ctx context.Context) (v bool, err error) {
 		return v, errors.New("OldActive is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldActive requires an UserId field in the mutation")
+		return v, errors.New("OldActive requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -3441,7 +3441,7 @@ func (m *PlanMutation) OldDescription(ctx context.Context) (v *string, err error
 		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDescription requires an UserId field in the mutation")
+		return v, errors.New("OldDescription requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -3889,7 +3889,7 @@ func newRoleMutation(c config, op Op, opts ...roleOption) *RoleMutation {
 	return m
 }
 
-// withRoleID sets the UserId field of the mutation.
+// withRoleID sets the ID field of the mutation.
 func withRoleID(id int16) roleOption {
 	return func(m *RoleMutation) {
 		var (
@@ -3996,7 +3996,7 @@ func (m *RoleMutation) OldName(ctx context.Context) (v string, err error) {
 		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldName requires an UserId field in the mutation")
+		return v, errors.New("OldName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -4032,7 +4032,7 @@ func (m *RoleMutation) OldDescription(ctx context.Context) (v *string, err error
 		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDescription requires an UserId field in the mutation")
+		return v, errors.New("OldDescription requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -4360,11 +4360,10 @@ type UserMutation struct {
 	op                      Op
 	typ                     string
 	id                      *int64
-	username                *string
+	mobile                  *string
 	password                *string
 	firstname               *string
 	lastname                *string
-	mobile                  *string
 	national_code           *string
 	active                  *bool
 	deleted                 *bool
@@ -4405,7 +4404,7 @@ func newUserMutation(c config, op Op, opts ...userOption) *UserMutation {
 	return m
 }
 
-// withUserID sets the UserId field of the mutation.
+// withUserID sets the ID field of the mutation.
 func withUserID(id int64) userOption {
 	return func(m *UserMutation) {
 		var (
@@ -4490,40 +4489,40 @@ func (m *UserMutation) IDs(ctx context.Context) ([]int64, error) {
 	}
 }
 
-// SetUsername sets the "username" field.
-func (m *UserMutation) SetUsername(s string) {
-	m.username = &s
+// SetMobile sets the "mobile" field.
+func (m *UserMutation) SetMobile(s string) {
+	m.mobile = &s
 }
 
-// Username returns the value of the "username" field in the mutation.
-func (m *UserMutation) Username() (r string, exists bool) {
-	v := m.username
+// Mobile returns the value of the "mobile" field in the mutation.
+func (m *UserMutation) Mobile() (r string, exists bool) {
+	v := m.mobile
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldUsername returns the old "username" field's value of the User entity.
+// OldMobile returns the old "mobile" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldUsername(ctx context.Context) (v string, err error) {
+func (m *UserMutation) OldMobile(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUsername is only allowed on UpdateOne operations")
+		return v, errors.New("OldMobile is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUsername requires an UserId field in the mutation")
+		return v, errors.New("OldMobile requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUsername: %w", err)
+		return v, fmt.Errorf("querying old value for OldMobile: %w", err)
 	}
-	return oldValue.Username, nil
+	return oldValue.Mobile, nil
 }
 
-// ResetUsername resets all changes to the "username" field.
-func (m *UserMutation) ResetUsername() {
-	m.username = nil
+// ResetMobile resets all changes to the "mobile" field.
+func (m *UserMutation) ResetMobile() {
+	m.mobile = nil
 }
 
 // SetPassword sets the "password" field.
@@ -4548,7 +4547,7 @@ func (m *UserMutation) OldPassword(ctx context.Context) (v string, err error) {
 		return v, errors.New("OldPassword is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPassword requires an UserId field in the mutation")
+		return v, errors.New("OldPassword requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -4584,7 +4583,7 @@ func (m *UserMutation) OldFirstname(ctx context.Context) (v *string, err error) 
 		return v, errors.New("OldFirstname is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldFirstname requires an UserId field in the mutation")
+		return v, errors.New("OldFirstname requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -4633,7 +4632,7 @@ func (m *UserMutation) OldLastname(ctx context.Context) (v *string, err error) {
 		return v, errors.New("OldLastname is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLastname requires an UserId field in the mutation")
+		return v, errors.New("OldLastname requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -4660,55 +4659,6 @@ func (m *UserMutation) ResetLastname() {
 	delete(m.clearedFields, user.FieldLastname)
 }
 
-// SetMobile sets the "mobile" field.
-func (m *UserMutation) SetMobile(s string) {
-	m.mobile = &s
-}
-
-// Mobile returns the value of the "mobile" field in the mutation.
-func (m *UserMutation) Mobile() (r string, exists bool) {
-	v := m.mobile
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldMobile returns the old "mobile" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldMobile(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldMobile is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldMobile requires an UserId field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMobile: %w", err)
-	}
-	return oldValue.Mobile, nil
-}
-
-// ClearMobile clears the value of the "mobile" field.
-func (m *UserMutation) ClearMobile() {
-	m.mobile = nil
-	m.clearedFields[user.FieldMobile] = struct{}{}
-}
-
-// MobileCleared returns if the "mobile" field was cleared in this mutation.
-func (m *UserMutation) MobileCleared() bool {
-	_, ok := m.clearedFields[user.FieldMobile]
-	return ok
-}
-
-// ResetMobile resets all changes to the "mobile" field.
-func (m *UserMutation) ResetMobile() {
-	m.mobile = nil
-	delete(m.clearedFields, user.FieldMobile)
-}
-
 // SetNationalCode sets the "national_code" field.
 func (m *UserMutation) SetNationalCode(s string) {
 	m.national_code = &s
@@ -4731,7 +4681,7 @@ func (m *UserMutation) OldNationalCode(ctx context.Context) (v string, err error
 		return v, errors.New("OldNationalCode is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldNationalCode requires an UserId field in the mutation")
+		return v, errors.New("OldNationalCode requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -4780,7 +4730,7 @@ func (m *UserMutation) OldActive(ctx context.Context) (v bool, err error) {
 		return v, errors.New("OldActive is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldActive requires an UserId field in the mutation")
+		return v, errors.New("OldActive requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -4816,7 +4766,7 @@ func (m *UserMutation) OldDeleted(ctx context.Context) (v bool, err error) {
 		return v, errors.New("OldDeleted is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeleted requires an UserId field in the mutation")
+		return v, errors.New("OldDeleted requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -4852,7 +4802,7 @@ func (m *UserMutation) OldAddress(ctx context.Context) (v *string, err error) {
 		return v, errors.New("OldAddress is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAddress requires an UserId field in the mutation")
+		return v, errors.New("OldAddress requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -4901,7 +4851,7 @@ func (m *UserMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an UserId field in the mutation")
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -4937,7 +4887,7 @@ func (m *UserMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an UserId field in the mutation")
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -5147,9 +5097,9 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 11)
-	if m.username != nil {
-		fields = append(fields, user.FieldUsername)
+	fields := make([]string, 0, 10)
+	if m.mobile != nil {
+		fields = append(fields, user.FieldMobile)
 	}
 	if m.password != nil {
 		fields = append(fields, user.FieldPassword)
@@ -5159,9 +5109,6 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.lastname != nil {
 		fields = append(fields, user.FieldLastname)
-	}
-	if m.mobile != nil {
-		fields = append(fields, user.FieldMobile)
 	}
 	if m.national_code != nil {
 		fields = append(fields, user.FieldNationalCode)
@@ -5189,16 +5136,14 @@ func (m *UserMutation) Fields() []string {
 // schema.
 func (m *UserMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case user.FieldUsername:
-		return m.Username()
+	case user.FieldMobile:
+		return m.Mobile()
 	case user.FieldPassword:
 		return m.Password()
 	case user.FieldFirstname:
 		return m.Firstname()
 	case user.FieldLastname:
 		return m.Lastname()
-	case user.FieldMobile:
-		return m.Mobile()
 	case user.FieldNationalCode:
 		return m.NationalCode()
 	case user.FieldActive:
@@ -5220,16 +5165,14 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case user.FieldUsername:
-		return m.OldUsername(ctx)
+	case user.FieldMobile:
+		return m.OldMobile(ctx)
 	case user.FieldPassword:
 		return m.OldPassword(ctx)
 	case user.FieldFirstname:
 		return m.OldFirstname(ctx)
 	case user.FieldLastname:
 		return m.OldLastname(ctx)
-	case user.FieldMobile:
-		return m.OldMobile(ctx)
 	case user.FieldNationalCode:
 		return m.OldNationalCode(ctx)
 	case user.FieldActive:
@@ -5251,12 +5194,12 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 // type.
 func (m *UserMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case user.FieldUsername:
+	case user.FieldMobile:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetUsername(v)
+		m.SetMobile(v)
 		return nil
 	case user.FieldPassword:
 		v, ok := value.(string)
@@ -5278,13 +5221,6 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLastname(v)
-		return nil
-	case user.FieldMobile:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetMobile(v)
 		return nil
 	case user.FieldNationalCode:
 		v, ok := value.(string)
@@ -5364,9 +5300,6 @@ func (m *UserMutation) ClearedFields() []string {
 	if m.FieldCleared(user.FieldLastname) {
 		fields = append(fields, user.FieldLastname)
 	}
-	if m.FieldCleared(user.FieldMobile) {
-		fields = append(fields, user.FieldMobile)
-	}
 	if m.FieldCleared(user.FieldNationalCode) {
 		fields = append(fields, user.FieldNationalCode)
 	}
@@ -5393,9 +5326,6 @@ func (m *UserMutation) ClearField(name string) error {
 	case user.FieldLastname:
 		m.ClearLastname()
 		return nil
-	case user.FieldMobile:
-		m.ClearMobile()
-		return nil
 	case user.FieldNationalCode:
 		m.ClearNationalCode()
 		return nil
@@ -5410,8 +5340,8 @@ func (m *UserMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *UserMutation) ResetField(name string) error {
 	switch name {
-	case user.FieldUsername:
-		m.ResetUsername()
+	case user.FieldMobile:
+		m.ResetMobile()
 		return nil
 	case user.FieldPassword:
 		m.ResetPassword()
@@ -5421,9 +5351,6 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldLastname:
 		m.ResetLastname()
-		return nil
-	case user.FieldMobile:
-		m.ResetMobile()
 		return nil
 	case user.FieldNationalCode:
 		m.ResetNationalCode()
@@ -5626,7 +5553,7 @@ func newUserPaymentPlanMutation(c config, op Op, opts ...userpaymentplanOption) 
 	return m
 }
 
-// withUserPaymentPlanID sets the UserId field of the mutation.
+// withUserPaymentPlanID sets the ID field of the mutation.
 func withUserPaymentPlanID(id int64) userpaymentplanOption {
 	return func(m *UserPaymentPlanMutation) {
 		var (
@@ -5734,7 +5661,7 @@ func (m *UserPaymentPlanMutation) OldAmount(ctx context.Context) (v int64, err e
 		return v, errors.New("OldAmount is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAmount requires an UserId field in the mutation")
+		return v, errors.New("OldAmount requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -5803,7 +5730,7 @@ func (m *UserPaymentPlanMutation) OldReferenceNumber(ctx context.Context) (v str
 		return v, errors.New("OldReferenceNumber is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldReferenceNumber requires an UserId field in the mutation")
+		return v, errors.New("OldReferenceNumber requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -5839,7 +5766,7 @@ func (m *UserPaymentPlanMutation) OldTransactionNumber(ctx context.Context) (v *
 		return v, errors.New("OldTransactionNumber is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTransactionNumber requires an UserId field in the mutation")
+		return v, errors.New("OldTransactionNumber requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -5888,7 +5815,7 @@ func (m *UserPaymentPlanMutation) OldSourceAccountNumber(ctx context.Context) (v
 		return v, errors.New("OldSourceAccountNumber is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSourceAccountNumber requires an UserId field in the mutation")
+		return v, errors.New("OldSourceAccountNumber requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -5937,7 +5864,7 @@ func (m *UserPaymentPlanMutation) OldDestinationAccountNumber(ctx context.Contex
 		return v, errors.New("OldDestinationAccountNumber is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDestinationAccountNumber requires an UserId field in the mutation")
+		return v, errors.New("OldDestinationAccountNumber requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -5986,7 +5913,7 @@ func (m *UserPaymentPlanMutation) OldDeleted(ctx context.Context) (v bool, err e
 		return v, errors.New("OldDeleted is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeleted requires an UserId field in the mutation")
+		return v, errors.New("OldDeleted requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
@@ -6022,7 +5949,7 @@ func (m *UserPaymentPlanMutation) OldCreatedAt(ctx context.Context) (v time.Time
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an UserId field in the mutation")
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {

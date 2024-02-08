@@ -152,8 +152,8 @@ func (uq *UserQuery) FirstX(ctx context.Context) *User {
 	return node
 }
 
-// FirstID returns the first User UserId from the query.
-// Returns a *NotFoundError when no User UserId was found.
+// FirstID returns the first User ID from the query.
+// Returns a *NotFoundError when no User ID was found.
 func (uq *UserQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
 	if ids, err = uq.Limit(1).IDs(setContextOp(ctx, uq.ctx, "FirstID")); err != nil {
@@ -202,8 +202,8 @@ func (uq *UserQuery) OnlyX(ctx context.Context) *User {
 	return node
 }
 
-// OnlyID is like Only, but returns the only User UserId in the query.
-// Returns a *NotSingularError when more than one User UserId is found.
+// OnlyID is like Only, but returns the only User ID in the query.
+// Returns a *NotSingularError when more than one User ID is found.
 // Returns a *NotFoundError when no entities are found.
 func (uq *UserQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
@@ -370,12 +370,12 @@ func (uq *UserQuery) WithUserpaymentplans(opts ...func(*UserPaymentPlanQuery)) *
 // Example:
 //
 //	var v []struct {
-//		Username string `json:"username,omitempty"`
+//		Mobile string `json:"mobile,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.User.Query().
-//		GroupBy(user.FieldUsername).
+//		GroupBy(user.FieldMobile).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (uq *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
@@ -393,11 +393,11 @@ func (uq *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Username string `json:"username,omitempty"`
+//		Mobile string `json:"mobile,omitempty"`
 //	}
 //
 //	client.User.Query().
-//		Select(user.FieldUsername).
+//		Select(user.FieldMobile).
 //		Scan(ctx, &v)
 func (uq *UserQuery) Select(fields ...string) *UserSelect {
 	uq.ctx.Fields = append(uq.ctx.Fields, fields...)

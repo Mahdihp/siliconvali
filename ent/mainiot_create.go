@@ -189,7 +189,7 @@ func (mic *MainIotCreate) AddDeviceiots(d ...*DeviceIot) *MainIotCreate {
 	return mic.AddDeviceiotIDs(ids...)
 }
 
-// SetUserIDID sets the "user_id" edge to the User entity by UserId.
+// SetUserIDID sets the "user_id" edge to the User entity by ID.
 func (mic *MainIotCreate) SetUserIDID(id int64) *MainIotCreate {
 	mic.mutation.SetUserIDID(id)
 	return mic

@@ -31,7 +31,7 @@ func main() {
 
 	//service := userservice.New(repositoryImpl)
 	//
-	//username, _ := service.GetByUsername("mahdi", "admin")
+	//username, _ := service.GetByMobile("mahdi", "admin")
 	//fmt.Println("service --------: ", username)
 
 	//StartServer()

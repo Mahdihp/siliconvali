@@ -4,21 +4,13 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"siliconvali/ent"
-	"siliconvali/repository/user_repository"
+	"siliconvali/dto"
 )
 
-type UserService struct {
-	repo user_repository.UserRepository
-}
-
-func New(repo user_repository.UserRepository) UserService {
-	return UserService{repo: repo}
-}
-
-func (us UserService) GetByUsername(username string, password string) (ent.User, error) {
-	getUsername, err := us.repo.GetByUsername(context.Background(), username)
-	return getUsername, err
+type UserService interface {
+	Register(u dto.UserInsertRequest) (dto.UserInsertResponse, error)
+	GetUserByPhoneNumber(phoneNumber string) (dto.UserInfo, error)
+	GetUserByID(ctx context.Context, userId uint) (dto.UserInfo, error)
 }
 
 func getMD5Hash(text string) string {

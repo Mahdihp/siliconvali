@@ -52,7 +52,6 @@ func DataSeed(client *ent.Client) {
 		).Save(ctx)
 
 		client.User.Create().
-			SetUsername("mahdi").
 			SetPassword("@123456@").
 			SetFirstname("Mahdi").
 			SetLastname("Hosseinpour").

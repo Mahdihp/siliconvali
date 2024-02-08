@@ -31,16 +31,16 @@ func (uu *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
 	return uu
 }
 
-// SetUsername sets the "username" field.
-func (uu *UserUpdate) SetUsername(s string) *UserUpdate {
-	uu.mutation.SetUsername(s)
+// SetMobile sets the "mobile" field.
+func (uu *UserUpdate) SetMobile(s string) *UserUpdate {
+	uu.mutation.SetMobile(s)
 	return uu
 }
 
-// SetNillableUsername sets the "username" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableUsername(s *string) *UserUpdate {
+// SetNillableMobile sets the "mobile" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableMobile(s *string) *UserUpdate {
 	if s != nil {
-		uu.SetUsername(*s)
+		uu.SetMobile(*s)
 	}
 	return uu
 }
@@ -96,26 +96,6 @@ func (uu *UserUpdate) SetNillableLastname(s *string) *UserUpdate {
 // ClearLastname clears the value of the "lastname" field.
 func (uu *UserUpdate) ClearLastname() *UserUpdate {
 	uu.mutation.ClearLastname()
-	return uu
-}
-
-// SetMobile sets the "mobile" field.
-func (uu *UserUpdate) SetMobile(s string) *UserUpdate {
-	uu.mutation.SetMobile(s)
-	return uu
-}
-
-// SetNillableMobile sets the "mobile" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableMobile(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetMobile(*s)
-	}
-	return uu
-}
-
-// ClearMobile clears the value of the "mobile" field.
-func (uu *UserUpdate) ClearMobile() *UserUpdate {
-	uu.mutation.ClearMobile()
 	return uu
 }
 
@@ -343,9 +323,9 @@ func (uu *UserUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (uu *UserUpdate) check() error {
-	if v, ok := uu.mutation.Username(); ok {
-		if err := user.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "User.username": %w`, err)}
+	if v, ok := uu.mutation.Mobile(); ok {
+		if err := user.MobileValidator(v); err != nil {
+			return &ValidationError{Name: "mobile", err: fmt.Errorf(`ent: validator failed for field "User.mobile": %w`, err)}
 		}
 	}
 	if v, ok := uu.mutation.Password(); ok {
@@ -361,11 +341,6 @@ func (uu *UserUpdate) check() error {
 	if v, ok := uu.mutation.Lastname(); ok {
 		if err := user.LastnameValidator(v); err != nil {
 			return &ValidationError{Name: "lastname", err: fmt.Errorf(`ent: validator failed for field "User.lastname": %w`, err)}
-		}
-	}
-	if v, ok := uu.mutation.Mobile(); ok {
-		if err := user.MobileValidator(v); err != nil {
-			return &ValidationError{Name: "mobile", err: fmt.Errorf(`ent: validator failed for field "User.mobile": %w`, err)}
 		}
 	}
 	if v, ok := uu.mutation.NationalCode(); ok {
@@ -393,8 +368,8 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := uu.mutation.Username(); ok {
-		_spec.SetField(user.FieldUsername, field.TypeString, value)
+	if value, ok := uu.mutation.Mobile(); ok {
+		_spec.SetField(user.FieldMobile, field.TypeString, value)
 	}
 	if value, ok := uu.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
@@ -410,12 +385,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uu.mutation.LastnameCleared() {
 		_spec.ClearField(user.FieldLastname, field.TypeString)
-	}
-	if value, ok := uu.mutation.Mobile(); ok {
-		_spec.SetField(user.FieldMobile, field.TypeString, value)
-	}
-	if uu.mutation.MobileCleared() {
-		_spec.ClearField(user.FieldMobile, field.TypeString)
 	}
 	if value, ok := uu.mutation.NationalCode(); ok {
 		_spec.SetField(user.FieldNationalCode, field.TypeString, value)
@@ -593,16 +562,16 @@ type UserUpdateOne struct {
 	mutation *UserMutation
 }
 
-// SetUsername sets the "username" field.
-func (uuo *UserUpdateOne) SetUsername(s string) *UserUpdateOne {
-	uuo.mutation.SetUsername(s)
+// SetMobile sets the "mobile" field.
+func (uuo *UserUpdateOne) SetMobile(s string) *UserUpdateOne {
+	uuo.mutation.SetMobile(s)
 	return uuo
 }
 
-// SetNillableUsername sets the "username" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableUsername(s *string) *UserUpdateOne {
+// SetNillableMobile sets the "mobile" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableMobile(s *string) *UserUpdateOne {
 	if s != nil {
-		uuo.SetUsername(*s)
+		uuo.SetMobile(*s)
 	}
 	return uuo
 }
@@ -658,26 +627,6 @@ func (uuo *UserUpdateOne) SetNillableLastname(s *string) *UserUpdateOne {
 // ClearLastname clears the value of the "lastname" field.
 func (uuo *UserUpdateOne) ClearLastname() *UserUpdateOne {
 	uuo.mutation.ClearLastname()
-	return uuo
-}
-
-// SetMobile sets the "mobile" field.
-func (uuo *UserUpdateOne) SetMobile(s string) *UserUpdateOne {
-	uuo.mutation.SetMobile(s)
-	return uuo
-}
-
-// SetNillableMobile sets the "mobile" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableMobile(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetMobile(*s)
-	}
-	return uuo
-}
-
-// ClearMobile clears the value of the "mobile" field.
-func (uuo *UserUpdateOne) ClearMobile() *UserUpdateOne {
-	uuo.mutation.ClearMobile()
 	return uuo
 }
 
@@ -918,9 +867,9 @@ func (uuo *UserUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (uuo *UserUpdateOne) check() error {
-	if v, ok := uuo.mutation.Username(); ok {
-		if err := user.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "User.username": %w`, err)}
+	if v, ok := uuo.mutation.Mobile(); ok {
+		if err := user.MobileValidator(v); err != nil {
+			return &ValidationError{Name: "mobile", err: fmt.Errorf(`ent: validator failed for field "User.mobile": %w`, err)}
 		}
 	}
 	if v, ok := uuo.mutation.Password(); ok {
@@ -936,11 +885,6 @@ func (uuo *UserUpdateOne) check() error {
 	if v, ok := uuo.mutation.Lastname(); ok {
 		if err := user.LastnameValidator(v); err != nil {
 			return &ValidationError{Name: "lastname", err: fmt.Errorf(`ent: validator failed for field "User.lastname": %w`, err)}
-		}
-	}
-	if v, ok := uuo.mutation.Mobile(); ok {
-		if err := user.MobileValidator(v); err != nil {
-			return &ValidationError{Name: "mobile", err: fmt.Errorf(`ent: validator failed for field "User.mobile": %w`, err)}
 		}
 	}
 	if v, ok := uuo.mutation.NationalCode(); ok {
@@ -985,8 +929,8 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			}
 		}
 	}
-	if value, ok := uuo.mutation.Username(); ok {
-		_spec.SetField(user.FieldUsername, field.TypeString, value)
+	if value, ok := uuo.mutation.Mobile(); ok {
+		_spec.SetField(user.FieldMobile, field.TypeString, value)
 	}
 	if value, ok := uuo.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
@@ -1002,12 +946,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if uuo.mutation.LastnameCleared() {
 		_spec.ClearField(user.FieldLastname, field.TypeString)
-	}
-	if value, ok := uuo.mutation.Mobile(); ok {
-		_spec.SetField(user.FieldMobile, field.TypeString, value)
-	}
-	if uuo.mutation.MobileCleared() {
-		_spec.ClearField(user.FieldMobile, field.TypeString)
 	}
 	if value, ok := uuo.mutation.NationalCode(); ok {
 		_spec.SetField(user.FieldNationalCode, field.TypeString, value)

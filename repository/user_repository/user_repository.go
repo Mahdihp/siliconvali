@@ -28,7 +28,7 @@ type UserRepository interface {
 	Insert(ctx context.Context, req dto.UserInsertRequest) (dto.UserInfo, error)
 	Update(ctx context.Context, req dto.UserUpdateRequest) error
 	DeleteById(ctx context.Context, userId int64) error
-	GetByUsername(ctx context.Context, username string) (dto.UserInfo, error)
+	GetByMobile(ctx context.Context, mobile string) (dto.UserInfo, error)
 	GetById(ctx context.Context, userId int64) (dto.UserInfo, error)
 	GetAll(ctx context.Context, req dto.GetAllUserRequest) ([]dto.UserInfo, error)
 }
@@ -101,11 +101,10 @@ func (userRepo *UserRepositoryImpl) GetAll(ctx context.Context, req dto.GetAllUs
 func (userRepo *UserRepositoryImpl) Insert(ctx context.Context, u dto.UserInsertRequest) (dto.UserInfo, error) {
 
 	newUser, err := userRepo.conn.Conn().User.Create().
-		SetUsername(u.Username).
+		SetMobile(u.Mobile).
 		SetFirstname(u.FirstName).
 		SetLastname(u.LastName).
 		SetNationalCode(u.NationalCode).
-		SetMobile(u.Mobile).
 		SetAddress(u.Address).SetActive(false).Save(ctx)
 
 	if err != nil {
@@ -115,11 +114,11 @@ func (userRepo *UserRepositoryImpl) Insert(ctx context.Context, u dto.UserInsert
 	return UserToUserInfo(newUser), nil
 }
 
-func (userRepo *UserRepositoryImpl) GetByUsername(ctx context.Context, username string) (dto.UserInfo, error) {
-	const op = "user_repository.GetByUsername"
+func (userRepo *UserRepositoryImpl) GetByMobile(ctx context.Context, mobile string) (dto.UserInfo, error) {
+	const op = "user_repository.GetByMobile"
 
 	userFound, err := userRepo.conn.Conn().User.Query().
-		Where(sql.FieldEQ(user.FieldUsername, username)).
+		Where(sql.FieldEQ(user.FieldMobile, mobile)).
 		First(ctx)
 
 	if err != nil {
@@ -151,11 +150,10 @@ func (userRepo UserRepositoryImpl) Update(ctx context.Context, req dto.UserUpdat
 			WithMessage(errmsg.ErrorMsgCantScanQueryResult).WithKind(richerror.KindUnexpected)
 	}
 
-	_, errUpdate := userFound.Update().SetUsername(req.Username).
+	_, errUpdate := userFound.Update().SetMobile(req.Mobile).
 		SetFirstname(req.FirstName).
 		SetLastname(req.LastName).
 		SetNationalCode(req.NationalCode).
-		SetMobile(req.Mobile).
 		SetAddress(req.Address).
 		SetMobile(req.Mobile).
 		Save(ctx)
@@ -173,9 +171,8 @@ func UsersToUserInfos(users []*ent.User) []dto.UserInfo {
 func UserToUserInfo(user *ent.User) dto.UserInfo {
 	userInfo := dto.UserInfo{
 		UserId:       user.ID,
-		Username:     user.Username,
-		NationalCode: user.NationalCode,
 		Mobile:       user.Mobile,
+		NationalCode: user.NationalCode,
 		Active:       user.Active,
 		Deleted:      user.Deleted,
 	}

@@ -104,8 +104,8 @@ func (ddq *DeviceDetailsQuery) FirstX(ctx context.Context) *DeviceDetails {
 	return node
 }
 
-// FirstID returns the first DeviceDetails UserId from the query.
-// Returns a *NotFoundError when no DeviceDetails UserId was found.
+// FirstID returns the first DeviceDetails ID from the query.
+// Returns a *NotFoundError when no DeviceDetails ID was found.
 func (ddq *DeviceDetailsQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = ddq.Limit(1).IDs(setContextOp(ctx, ddq.ctx, "FirstID")); err != nil {
@@ -154,8 +154,8 @@ func (ddq *DeviceDetailsQuery) OnlyX(ctx context.Context) *DeviceDetails {
 	return node
 }
 
-// OnlyID is like Only, but returns the only DeviceDetails UserId in the query.
-// Returns a *NotSingularError when more than one DeviceDetails UserId is found.
+// OnlyID is like Only, but returns the only DeviceDetails ID in the query.
+// Returns a *NotSingularError when more than one DeviceDetails ID is found.
 // Returns a *NotFoundError when no entities are found.
 func (ddq *DeviceDetailsQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int

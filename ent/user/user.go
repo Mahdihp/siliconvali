@@ -14,16 +14,14 @@ const (
 	Label = "user"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldUsername holds the string denoting the username field in the database.
-	FieldUsername = "username"
+	// FieldMobile holds the string denoting the mobile field in the database.
+	FieldMobile = "mobile"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
 	// FieldFirstname holds the string denoting the firstname field in the database.
 	FieldFirstname = "firstname"
 	// FieldLastname holds the string denoting the lastname field in the database.
 	FieldLastname = "lastname"
-	// FieldMobile holds the string denoting the mobile field in the database.
-	FieldMobile = "mobile"
 	// FieldNationalCode holds the string denoting the national_code field in the database.
 	FieldNationalCode = "national_code"
 	// FieldActive holds the string denoting the active field in the database.
@@ -68,11 +66,10 @@ const (
 // Columns holds all SQL columns for user fields.
 var Columns = []string{
 	FieldID,
-	FieldUsername,
+	FieldMobile,
 	FieldPassword,
 	FieldFirstname,
 	FieldLastname,
-	FieldMobile,
 	FieldNationalCode,
 	FieldActive,
 	FieldDeleted,
@@ -98,16 +95,14 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// UsernameValidator is a validator for the "username" field. It is called by the builders before save.
-	UsernameValidator func(string) error
+	// MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
+	MobileValidator func(string) error
 	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	PasswordValidator func(string) error
 	// FirstnameValidator is a validator for the "firstname" field. It is called by the builders before save.
 	FirstnameValidator func(string) error
 	// LastnameValidator is a validator for the "lastname" field. It is called by the builders before save.
 	LastnameValidator func(string) error
-	// MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
-	MobileValidator func(string) error
 	// NationalCodeValidator is a validator for the "national_code" field. It is called by the builders before save.
 	NationalCodeValidator func(string) error
 	// DefaultActive holds the default value on creation for the "active" field.
@@ -130,9 +125,9 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByUsername orders the results by the username field.
-func ByUsername(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUsername, opts...).ToFunc()
+// ByMobile orders the results by the mobile field.
+func ByMobile(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMobile, opts...).ToFunc()
 }
 
 // ByPassword orders the results by the password field.
@@ -148,11 +143,6 @@ func ByFirstname(opts ...sql.OrderTermOption) OrderOption {
 // ByLastname orders the results by the lastname field.
 func ByLastname(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLastname, opts...).ToFunc()
-}
-
-// ByMobile orders the results by the mobile field.
-func ByMobile(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldMobile, opts...).ToFunc()
 }
 
 // ByNationalCode orders the results by the national_code field.

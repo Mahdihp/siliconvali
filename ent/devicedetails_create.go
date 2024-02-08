@@ -39,13 +39,13 @@ func (ddc *DeviceDetailsCreate) SetID(i int) *DeviceDetailsCreate {
 	return ddc
 }
 
-// SetDeviceiotIDID sets the "deviceiot_id" edge to the DeviceIot entity by UserId.
+// SetDeviceiotIDID sets the "deviceiot_id" edge to the DeviceIot entity by ID.
 func (ddc *DeviceDetailsCreate) SetDeviceiotIDID(id int64) *DeviceDetailsCreate {
 	ddc.mutation.SetDeviceiotIDID(id)
 	return ddc
 }
 
-// SetNillableDeviceiotIDID sets the "deviceiot_id" edge to the DeviceIot entity by UserId if the given value is not nil.
+// SetNillableDeviceiotIDID sets the "deviceiot_id" edge to the DeviceIot entity by ID if the given value is not nil.
 func (ddc *DeviceDetailsCreate) SetNillableDeviceiotIDID(id *int64) *DeviceDetailsCreate {
 	if id != nil {
 		ddc = ddc.SetDeviceiotIDID(*id)

@@ -23,9 +23,9 @@ type UserCreate struct {
 	hooks    []Hook
 }
 
-// SetUsername sets the "username" field.
-func (uc *UserCreate) SetUsername(s string) *UserCreate {
-	uc.mutation.SetUsername(s)
+// SetMobile sets the "mobile" field.
+func (uc *UserCreate) SetMobile(s string) *UserCreate {
+	uc.mutation.SetMobile(s)
 	return uc
 }
 
@@ -59,20 +59,6 @@ func (uc *UserCreate) SetLastname(s string) *UserCreate {
 func (uc *UserCreate) SetNillableLastname(s *string) *UserCreate {
 	if s != nil {
 		uc.SetLastname(*s)
-	}
-	return uc
-}
-
-// SetMobile sets the "mobile" field.
-func (uc *UserCreate) SetMobile(s string) *UserCreate {
-	uc.mutation.SetMobile(s)
-	return uc
-}
-
-// SetNillableMobile sets the "mobile" field if the given value is not nil.
-func (uc *UserCreate) SetNillableMobile(s *string) *UserCreate {
-	if s != nil {
-		uc.SetMobile(*s)
 	}
 	return uc
 }
@@ -267,12 +253,12 @@ func (uc *UserCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (uc *UserCreate) check() error {
-	if _, ok := uc.mutation.Username(); !ok {
-		return &ValidationError{Name: "username", err: errors.New(`ent: missing required field "User.username"`)}
+	if _, ok := uc.mutation.Mobile(); !ok {
+		return &ValidationError{Name: "mobile", err: errors.New(`ent: missing required field "User.mobile"`)}
 	}
-	if v, ok := uc.mutation.Username(); ok {
-		if err := user.UsernameValidator(v); err != nil {
-			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "User.username": %w`, err)}
+	if v, ok := uc.mutation.Mobile(); ok {
+		if err := user.MobileValidator(v); err != nil {
+			return &ValidationError{Name: "mobile", err: fmt.Errorf(`ent: validator failed for field "User.mobile": %w`, err)}
 		}
 	}
 	if _, ok := uc.mutation.Password(); !ok {
@@ -291,11 +277,6 @@ func (uc *UserCreate) check() error {
 	if v, ok := uc.mutation.Lastname(); ok {
 		if err := user.LastnameValidator(v); err != nil {
 			return &ValidationError{Name: "lastname", err: fmt.Errorf(`ent: validator failed for field "User.lastname": %w`, err)}
-		}
-	}
-	if v, ok := uc.mutation.Mobile(); ok {
-		if err := user.MobileValidator(v); err != nil {
-			return &ValidationError{Name: "mobile", err: fmt.Errorf(`ent: validator failed for field "User.mobile": %w`, err)}
 		}
 	}
 	if v, ok := uc.mutation.NationalCode(); ok {
@@ -352,9 +333,9 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := uc.mutation.Username(); ok {
-		_spec.SetField(user.FieldUsername, field.TypeString, value)
-		_node.Username = value
+	if value, ok := uc.mutation.Mobile(); ok {
+		_spec.SetField(user.FieldMobile, field.TypeString, value)
+		_node.Mobile = value
 	}
 	if value, ok := uc.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
@@ -367,10 +348,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Lastname(); ok {
 		_spec.SetField(user.FieldLastname, field.TypeString, value)
 		_node.Lastname = &value
-	}
-	if value, ok := uc.mutation.Mobile(); ok {
-		_spec.SetField(user.FieldMobile, field.TypeString, value)
-		_node.Mobile = value
 	}
 	if value, ok := uc.mutation.NationalCode(); ok {
 		_spec.SetField(user.FieldNationalCode, field.TypeString, value)

@@ -99,10 +99,10 @@ func init() {
 	role.DescriptionValidator = roleDescDescription.Validators[0].(func(string) error)
 	userFields := schema.User{}.Fields()
 	_ = userFields
-	// userDescUsername is the schema descriptor for username field.
-	userDescUsername := userFields[1].Descriptor()
-	// user.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
-	user.UsernameValidator = userDescUsername.Validators[0].(func(string) error)
+	// userDescMobile is the schema descriptor for mobile field.
+	userDescMobile := userFields[1].Descriptor()
+	// user.MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
+	user.MobileValidator = userDescMobile.Validators[0].(func(string) error)
 	// userDescPassword is the schema descriptor for password field.
 	userDescPassword := userFields[2].Descriptor()
 	// user.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
@@ -115,32 +115,28 @@ func init() {
 	userDescLastname := userFields[4].Descriptor()
 	// user.LastnameValidator is a validator for the "lastname" field. It is called by the builders before save.
 	user.LastnameValidator = userDescLastname.Validators[0].(func(string) error)
-	// userDescMobile is the schema descriptor for mobile field.
-	userDescMobile := userFields[5].Descriptor()
-	// user.MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
-	user.MobileValidator = userDescMobile.Validators[0].(func(string) error)
 	// userDescNationalCode is the schema descriptor for national_code field.
-	userDescNationalCode := userFields[6].Descriptor()
+	userDescNationalCode := userFields[5].Descriptor()
 	// user.NationalCodeValidator is a validator for the "national_code" field. It is called by the builders before save.
 	user.NationalCodeValidator = userDescNationalCode.Validators[0].(func(string) error)
 	// userDescActive is the schema descriptor for active field.
-	userDescActive := userFields[7].Descriptor()
+	userDescActive := userFields[6].Descriptor()
 	// user.DefaultActive holds the default value on creation for the active field.
 	user.DefaultActive = userDescActive.Default.(bool)
 	// userDescDeleted is the schema descriptor for deleted field.
-	userDescDeleted := userFields[8].Descriptor()
+	userDescDeleted := userFields[7].Descriptor()
 	// user.DefaultDeleted holds the default value on creation for the deleted field.
 	user.DefaultDeleted = userDescDeleted.Default.(bool)
 	// userDescAddress is the schema descriptor for address field.
-	userDescAddress := userFields[9].Descriptor()
+	userDescAddress := userFields[8].Descriptor()
 	// user.AddressValidator is a validator for the "address" field. It is called by the builders before save.
 	user.AddressValidator = userDescAddress.Validators[0].(func(string) error)
 	// userDescCreatedAt is the schema descriptor for created_at field.
-	userDescCreatedAt := userFields[10].Descriptor()
+	userDescCreatedAt := userFields[9].Descriptor()
 	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
 	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
 	// userDescUpdatedAt is the schema descriptor for updated_at field.
-	userDescUpdatedAt := userFields[11].Descriptor()
+	userDescUpdatedAt := userFields[10].Descriptor()
 	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(time.Time)
 	userpaymentplanFields := schema.UserPaymentPlan{}.Fields()

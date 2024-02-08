@@ -241,7 +241,7 @@ func (miu *MainIotUpdate) AddDeviceiots(d ...*DeviceIot) *MainIotUpdate {
 	return miu.AddDeviceiotIDs(ids...)
 }
 
-// SetUserIDID sets the "user_id" edge to the User entity by UserId.
+// SetUserIDID sets the "user_id" edge to the User entity by ID.
 func (miu *MainIotUpdate) SetUserIDID(id int64) *MainIotUpdate {
 	miu.mutation.SetUserIDID(id)
 	return miu
@@ -718,7 +718,7 @@ func (miuo *MainIotUpdateOne) AddDeviceiots(d ...*DeviceIot) *MainIotUpdateOne {
 	return miuo.AddDeviceiotIDs(ids...)
 }
 
-// SetUserIDID sets the "user_id" edge to the User entity by UserId.
+// SetUserIDID sets the "user_id" edge to the User entity by ID.
 func (miuo *MainIotUpdateOne) SetUserIDID(id int64) *MainIotUpdateOne {
 	miuo.mutation.SetUserIDID(id)
 	return miuo

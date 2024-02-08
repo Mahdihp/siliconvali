@@ -133,11 +133,10 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "username", Type: field.TypeString, Unique: true, Size: 50},
+		{Name: "mobile", Type: field.TypeString, Unique: true, Size: 11},
 		{Name: "password", Type: field.TypeString, Size: 50},
 		{Name: "firstname", Type: field.TypeString, Nullable: true, Size: 100},
 		{Name: "lastname", Type: field.TypeString, Nullable: true, Size: 100},
-		{Name: "mobile", Type: field.TypeString, Nullable: true, Size: 11},
 		{Name: "national_code", Type: field.TypeString, Nullable: true, Size: 10},
 		{Name: "active", Type: field.TypeBool, Default: true},
 		{Name: "deleted", Type: field.TypeBool, Default: false},
