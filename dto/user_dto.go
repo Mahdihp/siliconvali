@@ -39,7 +39,7 @@ type UserInfo struct {
 	Address      string `json:"address"`
 }
 
-type UserGetAllRequest struct {
+type GetAllUserRequest struct {
 	PageIndex int `json:"page_index"`
 	PageSize  int `json:"page_size"`
 }

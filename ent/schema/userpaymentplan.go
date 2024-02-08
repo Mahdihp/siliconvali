@@ -18,7 +18,7 @@ func (UserPaymentPlan) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id"),
 		field.Int64("amount").Optional().Comment("مبلغ"),
-		field.String("reference_number").Comment("کد پیگیری"),
+		field.String("reference_number").Unique().Comment("کد پیگیری"),
 		field.String("transaction_number").Optional().Nillable().Comment("کد تراکنش"),
 		field.String("source_account_number").Optional().Nillable().Comment("شماره حساب مبدا"),
 		field.String("destination_account_number").Optional().Nillable().Comment("شماره حساب مقصد"),

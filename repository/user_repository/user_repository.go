@@ -30,11 +30,11 @@ type UserRepository interface {
 	DeleteById(ctx context.Context, userId int64) error
 	GetByUsername(ctx context.Context, username string) (dto.UserInfo, error)
 	GetById(ctx context.Context, userId int64) (dto.UserInfo, error)
-	GetAll(ctx context.Context, req dto.UserGetAllRequest) ([]dto.UserInfo, error)
+	GetAll(ctx context.Context, req dto.GetAllUserRequest) ([]dto.UserInfo, error)
 }
 
 func (userRepo *UserRepositoryImpl) DeleteById(ctx context.Context, userId int64) error {
-	const op = "postgresuser.DeleteById"
+	const op = "user_repository.DeleteById"
 
 	userFound, err := userRepo.conn.Conn().User.Query().
 		Where(user.And(sql.FieldEQ(user.FieldID, userId), sql.FieldEQ(user.FieldDeleted, false))).
@@ -58,7 +58,7 @@ func (userRepo *UserRepositoryImpl) DeleteById(ctx context.Context, userId int64
 }
 
 func (userRepo *UserRepositoryImpl) GetById(ctx context.Context, userId int64) (dto.UserInfo, error) {
-	const op = "postgresuser.GetById"
+	const op = "user_repository.GetById"
 
 	userFound, err := userRepo.conn.Conn().User.Query().
 		Where(sql.FieldEQ(user.FieldID, userId)).
@@ -76,8 +76,8 @@ func (userRepo *UserRepositoryImpl) GetById(ctx context.Context, userId int64) (
 	return UserToUserInfo(userFound), nil
 }
 
-func (userRepo *UserRepositoryImpl) GetAll(ctx context.Context, req dto.UserGetAllRequest) ([]dto.UserInfo, error) {
-	const op = "postgresuser.GetAll"
+func (userRepo *UserRepositoryImpl) GetAll(ctx context.Context, req dto.GetAllUserRequest) ([]dto.UserInfo, error) {
+	const op = "user_repository.GetAll"
 
 	users, err := userRepo.conn.Conn().User.Query().
 		Order(ent.Desc(user.FieldCreatedAt)).
@@ -116,7 +116,7 @@ func (userRepo *UserRepositoryImpl) Insert(ctx context.Context, u dto.UserInsert
 }
 
 func (userRepo *UserRepositoryImpl) GetByUsername(ctx context.Context, username string) (dto.UserInfo, error) {
-	const op = "postgresuser.GetByUsername"
+	const op = "user_repository.GetByUsername"
 
 	userFound, err := userRepo.conn.Conn().User.Query().
 		Where(sql.FieldEQ(user.FieldUsername, username)).
@@ -135,7 +135,7 @@ func (userRepo *UserRepositoryImpl) GetByUsername(ctx context.Context, username 
 }
 
 func (userRepo UserRepositoryImpl) Update(ctx context.Context, req dto.UserUpdateRequest) error {
-	const op = "postgresuser.Update"
+	const op = "user_repository.Update"
 
 	userFound, err := userRepo.conn.Conn().User.Query().
 		Where(sql.FieldEQ(user.FieldID, req.UserId)).
