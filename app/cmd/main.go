@@ -8,8 +8,8 @@ import (
 	_ "github.com/lib/pq"
 	"siliconvali/config"
 	"siliconvali/dto"
-	"siliconvali/repository/postgres"
-	"siliconvali/repository/user_repository"
+	"siliconvali/repositories/postgres"
+	"siliconvali/repositories/user_repository"
 )
 
 var AppConfig config.AppConfiguration

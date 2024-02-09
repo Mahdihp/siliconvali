@@ -3,7 +3,7 @@ package deviceiot_repository
 import (
 	"context"
 	"siliconvali/dto"
-	"siliconvali/repository/postgres"
+	"siliconvali/repositories/postgres"
 )
 
 type DeviceIotRepositoryImpl struct {

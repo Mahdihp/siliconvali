@@ -3,7 +3,7 @@ package mainiot_repository
 import (
 	"context"
 	"siliconvali/dto"
-	"siliconvali/repository/postgres"
+	"siliconvali/repositories/postgres"
 )
 
 type MainIotRepositoryImpl struct {

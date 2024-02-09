@@ -9,7 +9,7 @@ import (
 	"siliconvali/ent/user"
 	richerror "siliconvali/pkg"
 	"siliconvali/pkg/errmsg"
-	"siliconvali/repository/postgres"
+	"siliconvali/repositories/postgres"
 )
 
 // https://github.com/gocasts-bootcamp/gameapp/blob/main/repository/mysql/mysqluser/user.go

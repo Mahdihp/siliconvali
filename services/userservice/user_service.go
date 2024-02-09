@@ -8,7 +8,7 @@ import (
 	"siliconvali/ent"
 )
 
-type UserServiceRepositort interface {
+type UserServiceRepository interface {
 	Register(u dto.UserInsertRequest) (dto.UserInsertResponse, error)
 	GetUserByPhoneNumber(phoneNumber string) (dto.UserInfo, error)
 	GetUserByID(ctx context.Context, userId uint) (dto.UserInfo, error)
@@ -19,13 +19,13 @@ type AuthGenerator interface {
 	CreateRefreshToken(user ent.User) (string, error)
 }
 
-type UserServiceRepositortImpl struct {
+type UserServiceRepositoryImpl struct {
 	auth AuthGenerator
-	repo UserServiceRepositort
+	repo UserServiceRepository
 }
 
-func New(authGenerator AuthGenerator, repo UserServiceRepositort) UserServiceRepositortImpl {
-	return UserServiceRepositortImpl{
+func New(authGenerator AuthGenerator, repo UserServiceRepository) UserServiceRepositoryImpl {
+	return UserServiceRepositoryImpl{
 		auth: authGenerator,
 		repo: repo,
 	}
