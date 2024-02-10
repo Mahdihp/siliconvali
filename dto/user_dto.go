@@ -7,6 +7,7 @@ type UserInsertRequest struct {
 	LastName     string `json:"last_name"`
 	NationalCode string `json:"national_code"`
 	Address      string `json:"address"`
+	RoleId       int16  `json:"role_id"`
 }
 type UserInsertResponse struct {
 	User UserInfo `json:"user"`
@@ -27,14 +28,16 @@ type Tokens struct {
 }
 
 type UserInfo struct {
-	UserId       int64  `json:"user_id"`
-	Mobile       string `json:"mobile"`
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`
-	NationalCode string `json:"national_code"`
-	Active       bool   `json:"active"`
-	Deleted      bool   `json:"deleted"`
-	Address      string `json:"address"`
+	UserId       int64      `json:"user_id"`
+	Mobile       string     `json:"mobile"`
+	Password     string     `json:"password"`
+	FirstName    string     `json:"first_name"`
+	LastName     string     `json:"last_name"`
+	NationalCode string     `json:"national_code"`
+	Active       bool       `json:"active"`
+	Deleted      bool       `json:"deleted"`
+	Address      string     `json:"address"`
+	Roles        []RoleInfo `json:"role_id"`
 }
 
 type GetAllUserRequest struct {
@@ -50,6 +53,7 @@ type UserUpdateRequest struct {
 	LastName     string `json:"last_name"`
 	NationalCode string `json:"national_code"`
 	Address      string `json:"address"`
+	RoleId       int16  `json:"role_id"`
 }
 type UserUpdateResponse struct {
 	User UserInfo `json:"user"`

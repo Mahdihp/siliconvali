@@ -4,31 +4,103 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 	"siliconvali/dto"
-	"siliconvali/ent"
+	richerror "siliconvali/pkg"
+	"siliconvali/repositories/user_repository"
 )
 
-type UserServiceRepository interface {
-	Register(u dto.UserInsertRequest) (dto.UserInsertResponse, error)
-	GetUserByPhoneNumber(phoneNumber string) (dto.UserInfo, error)
-	GetUserByID(ctx context.Context, userId uint) (dto.UserInfo, error)
+type Repository interface {
+	Register(ctx context.Context, u dto.UserInsertRequest) (dto.UserInfo, error)
+	GetById(ctx context.Context, userId int64) (dto.UserInfo, error)
+	GetAll(ctx context.Context, req dto.GetAllUserRequest) ([]dto.UserInfo, error)
+	Update(ctx context.Context, req dto.UserUpdateRequest) error
 }
 
 type AuthGenerator interface {
-	CreateAccessToken(user ent.User) (string, error)
-	CreateRefreshToken(user ent.User) (string, error)
+	CreateAccessToken(user dto.UserInfo) (string, error)
+	CreateRefreshToken(user dto.UserInfo) (string, error)
 }
 
-type UserServiceRepositoryImpl struct {
+type UserService struct {
 	auth AuthGenerator
-	repo UserServiceRepository
+	repo user_repository.UserRepository
 }
 
-func New(authGenerator AuthGenerator, repo UserServiceRepository) UserServiceRepositoryImpl {
-	return UserServiceRepositoryImpl{
+func New(authGenerator AuthGenerator, repo user_repository.UserRepository) UserService {
+	return UserService{
 		auth: authGenerator,
 		repo: repo,
 	}
+}
+
+func (receiver UserService) Login(ctx context.Context, req dto.LoginRequest) (dto.LoginResponse, error) {
+	const op = "UserService.Login"
+
+	user, err := receiver.repo.GetByMobile(ctx, req.Mobile)
+	if err != nil {
+		return dto.LoginResponse{}, richerror.New(op).WithErr(err).
+			WithMeta(map[string]interface{}{"phone_number": req.Mobile})
+	}
+
+	if user.Password != getMD5Hash(req.Password) {
+		return dto.LoginResponse{}, fmt.Errorf("username or password isn't correct")
+	}
+
+	accessToken, err := receiver.auth.CreateAccessToken(user)
+	if err != nil {
+		return dto.LoginResponse{}, fmt.Errorf("unexpected error: %w", err)
+	}
+
+	refreshToken, err := receiver.auth.CreateRefreshToken(user)
+	if err != nil {
+		return dto.LoginResponse{}, fmt.Errorf("unexpected error: %w", err)
+	}
+
+	return dto.LoginResponse{
+		User: user,
+		Tokens: dto.Tokens{
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken},
+	}, nil
+
+}
+func (receiver UserService) Update(ctx context.Context, req dto.UserUpdateRequest) error {
+	const op = "UserService.Update"
+	err := receiver.repo.Update(ctx, req)
+	if err != nil {
+		return richerror.New(op).WithErr(err).
+			WithMeta(map[string]interface{}{"req": req})
+	}
+	return nil
+}
+func (receiver UserService) GetAll(ctx context.Context, req dto.GetAllUserRequest) ([]dto.UserInfo, error) {
+	const op = "UserService.GetAll"
+	all, err := receiver.repo.GetAll(ctx, req)
+	if err != nil {
+		return []dto.UserInfo{}, richerror.New(op).WithErr(err).
+			WithMeta(map[string]interface{}{"req": req})
+	}
+	return all, nil
+}
+func (receiver UserService) GetById(ctx context.Context, userId int64) (dto.UserInfo, error) {
+	const op = "UserService.GetUserByID"
+
+	userInfo, err := receiver.repo.GetById(ctx, userId)
+	if err != nil {
+		return dto.UserInfo{}, richerror.New(op).WithErr(err).
+			WithMeta(map[string]interface{}{"req": userId})
+	}
+	return userInfo, nil
+}
+func (receiver UserService) Register(ctx context.Context, req dto.UserInsertRequest) (dto.UserInfo, error) {
+
+	insert, err := receiver.repo.Insert(ctx, req)
+	if err != nil {
+		return dto.UserInfo{}, fmt.Errorf("unexpected error: %w", err)
+	}
+
+	return insert, nil
 }
 
 func getMD5Hash(text string) string {

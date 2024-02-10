@@ -13,5 +13,12 @@
   "Migration": {
     "MigrationDir": "migrations/sqlite3",
     "MigrationTable": "migrations"
+  },
+  "AuthConfig": {
+    "SignKey": "jwt_secret",
+    "AccessExpirationTime": 24,
+    "RefreshExpirationTime": 24,
+    "AccessSubject": "ac",
+    "RefreshSubject": "rt"
   }
 }

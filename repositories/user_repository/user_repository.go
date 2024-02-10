@@ -14,6 +14,15 @@ import (
 
 // https://github.com/gocasts-bootcamp/gameapp/blob/main/repository/mysql/mysqluser/user.go
 
+type UserRepository interface {
+	Insert(ctx context.Context, req dto.UserInsertRequest) (dto.UserInfo, error)
+	Update(ctx context.Context, req dto.UserUpdateRequest) error
+	DeleteById(ctx context.Context, userId int64) error
+	GetByMobile(ctx context.Context, mobile string) (dto.UserInfo, error)
+	GetById(ctx context.Context, userId int64) (dto.UserInfo, error)
+	GetAll(ctx context.Context, req dto.GetAllUserRequest) ([]dto.UserInfo, error)
+}
+
 type UserRepositoryImpl struct {
 	conn *postgres.PostgresqlDB
 }
@@ -22,15 +31,6 @@ func New(conn *postgres.PostgresqlDB) *UserRepositoryImpl {
 	return &UserRepositoryImpl{
 		conn: conn,
 	}
-}
-
-type UserRepository interface {
-	Insert(ctx context.Context, req dto.UserInsertRequest) (dto.UserInfo, error)
-	Update(ctx context.Context, req dto.UserUpdateRequest) error
-	DeleteById(ctx context.Context, userId int64) error
-	GetByMobile(ctx context.Context, mobile string) (dto.UserInfo, error)
-	GetById(ctx context.Context, userId int64) (dto.UserInfo, error)
-	GetAll(ctx context.Context, req dto.GetAllUserRequest) ([]dto.UserInfo, error)
 }
 
 func (userRepo *UserRepositoryImpl) DeleteById(ctx context.Context, userId int64) error {
@@ -98,6 +98,24 @@ func (userRepo *UserRepositoryImpl) GetAll(ctx context.Context, req dto.GetAllUs
 	return UsersToUserInfos(users), nil
 }
 
+func (userRepo *UserRepositoryImpl) Insert2(ctx context.Context, u ent.User) (ent.User, error) {
+
+	newUser, err := userRepo.conn.Conn().User.Create().
+		SetMobile(u.Mobile).
+		SetFirstname(*u.Firstname).
+		SetLastname(*u.Lastname).
+		SetNationalCode(u.NationalCode).
+		SetAddress(*u.Address).
+		SetActive(true).
+		AddRoles(u.Edges.Roles...).
+		Save(ctx)
+
+	if err != nil {
+		return ent.User{}, fmt.Errorf("can't execute command: %w", err)
+	}
+
+	return *newUser, nil
+}
 func (userRepo *UserRepositoryImpl) Insert(ctx context.Context, u dto.UserInsertRequest) (dto.UserInfo, error) {
 
 	newUser, err := userRepo.conn.Conn().User.Create().
@@ -105,7 +123,10 @@ func (userRepo *UserRepositoryImpl) Insert(ctx context.Context, u dto.UserInsert
 		SetFirstname(u.FirstName).
 		SetLastname(u.LastName).
 		SetNationalCode(u.NationalCode).
-		SetAddress(u.Address).SetActive(false).Save(ctx)
+		SetAddress(u.Address).
+		SetActive(false).
+		AddRoleIDs(u.RoleId).
+		Save(ctx)
 
 	if err != nil {
 		return dto.UserInfo{}, fmt.Errorf("can't execute command: %w", err)
@@ -156,6 +177,7 @@ func (userRepo UserRepositoryImpl) Update(ctx context.Context, req dto.UserUpdat
 		SetNationalCode(req.NationalCode).
 		SetAddress(req.Address).
 		SetMobile(req.Mobile).
+		AddRoleIDs(req.RoleId).
 		Save(ctx)
 
 	return errUpdate
