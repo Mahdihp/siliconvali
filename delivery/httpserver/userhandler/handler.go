@@ -2,7 +2,7 @@ package userhandler
 
 import (
 	"context"
-	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v2"
 	"net/http"
 	"siliconvali/config"
 	"siliconvali/dto"
@@ -24,12 +24,12 @@ func New(authConfig config.AuthConfig, authSvc authservice.AuthService,
 		userSvc:    userSvc,
 	}
 }
-func (h Handler) userLogin(c fiber.Ctx) error {
+func (h Handler) userLogin(c *fiber.Ctx) error {
 	var req dto.LoginRequest
-	if err := c.Bind().Body(req); err != nil {
+
+	if err := c.BodyParser(&req); err != nil {
 		return fiber.NewError(http.StatusBadRequest)
 	}
-
 	//TODO: validate request
 
 	resp, err := h.userSvc.Login(context.Background(), req)

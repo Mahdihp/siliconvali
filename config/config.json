@@ -19,6 +19,7 @@
     "AccessExpirationTime": 24,
     "RefreshExpirationTime": 24,
     "AccessSubject": "ac",
-    "RefreshSubject": "rt"
+    "RefreshSubject": "rt",
+    "GracefulShutdownTimeout": 5
   }
 }

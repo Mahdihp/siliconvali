@@ -3,13 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/middleware/logger"
 	_ "github.com/lib/pq"
+	"os"
+	"os/signal"
 	"siliconvali/config"
-	"siliconvali/dto"
+	"siliconvali/delivery/httpserver"
 	"siliconvali/repositories/postgres"
 	"siliconvali/repositories/user_repository"
+	"siliconvali/services/authservice"
+	"siliconvali/services/userservice"
 )
 
 var AppConfig config.AppConfiguration
@@ -21,41 +23,37 @@ func init() {
 }
 func main() {
 
-	dbClient := postgres.New(AppConfig.DbConfig)
-	//ctx := context.Background()
-	//count, _ := dbClient.Role.Query().Count(ctx)
-	//fmt.Println("Role.Query(): ", count)
-	repositoryImpl := user_repository.New(dbClient)
-	user, _ := repositoryImpl.GetAll(context.Background(), dto.GetAllUserRequest{PageIndex: 1, PageSize: 2})
-	fmt.Printf("service --------: %+v \n", user)
+	authService, userService := setupServices(AppConfig)
+	server := httpserver.New(AppConfig, authService, userService)
+	go func() {
+		server.Serve()
+	}()
 
-	//service := userservice.New(repositoryImpl)
-	//
-	//username, _ := service.GetByMobile("mahdi", "admin")
-	//fmt.Println("service --------: ", username)
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
 
-	//StartServer()
+	ctx := context.Background()
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, AppConfig.AuthConfig.GracefulShutdownTimeout)
+	defer cancel()
+
+	if err := server.Router.ShutdownWithTimeout(AppConfig.AuthConfig.GracefulShutdownTimeout); err != nil {
+		fmt.Println("http server shutdown error", err)
+	}
+
+	fmt.Println("received interrupt signal, shutting down gracefully..")
+	<-ctxWithTimeout.Done()
 }
 
-func StartServer() {
-	app := fiber.New(fiber.Config{
-		CaseSensitive: true,
-		StrictRouting: true,
-		ServerHeader:  "Silicon Ali",
-		AppName:       "Test App v1.0.1",
-	})
-	app.Use(logger.New(logger.Config{
-		Format: "[${ip}]:${port} ${status} - ${method} ${path}\n",
-	}))
+func setupServices(cfg config.AppConfiguration) (authservice.AuthService, userservice.UserService) {
 
-	app.Use(logger.New(logger.Config{
-		Format:     "${pid} ${status} - ${method} ${path}\n",
-		TimeFormat: "02-Jan-2006",
-		TimeZone:   "America/New_York",
-	}))
+	postgresqlDB := postgres.New(cfg.DbConfig)
 
-	app.Get("/Add", func(c fiber.Ctx) error {
-		return c.SendString("Hello, World 👋!")
-	})
-	app.Listen(AppConfig.Server.Host + AppConfig.Server.Port)
+	authSvc := authservice.New(cfg.AuthConfig)
+
+	userRepositoryImpl := user_repository.New(postgresqlDB)
+	userService := userservice.New(authSvc, userRepositoryImpl)
+
+	return authSvc, userService
+
 }

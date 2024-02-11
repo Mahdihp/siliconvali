@@ -2,11 +2,11 @@ package userservice
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"siliconvali/dto"
 	richerror "siliconvali/pkg"
+	"siliconvali/pkg/errmsg"
+	"siliconvali/pkg/util"
 	"siliconvali/repositories/user_repository"
 )
 
@@ -40,11 +40,13 @@ func (receiver UserService) Login(ctx context.Context, req dto.LoginRequest) (dt
 	user, err := receiver.repo.GetByMobile(ctx, req.Mobile)
 	if err != nil {
 		return dto.LoginResponse{}, richerror.New(op).WithErr(err).
-			WithMeta(map[string]interface{}{"phone_number": req.Mobile})
+			WithMeta(map[string]interface{}{"mobile": req.Mobile})
 	}
+	hash := util.StringToMD5Hash(req.Password)
+	fmt.Println(user.Password != hash)
 
-	if user.Password != getMD5Hash(req.Password) {
-		return dto.LoginResponse{}, fmt.Errorf("username or password isn't correct")
+	if user.Password != hash {
+		return dto.LoginResponse{}, fmt.Errorf(errmsg.ErrorMsg_User_Incorrect_User_Pass)
 	}
 
 	accessToken, err := receiver.auth.CreateAccessToken(user)
@@ -56,7 +58,7 @@ func (receiver UserService) Login(ctx context.Context, req dto.LoginRequest) (dt
 	if err != nil {
 		return dto.LoginResponse{}, fmt.Errorf("unexpected error: %w", err)
 	}
-
+	user.Password = ""
 	return dto.LoginResponse{
 		User: user,
 		Tokens: dto.Tokens{
@@ -101,9 +103,4 @@ func (receiver UserService) Register(ctx context.Context, req dto.UserInsertRequ
 	}
 
 	return insert, nil
-}
-
-func getMD5Hash(text string) string {
-	hash := md5.Sum([]byte(text))
-	return hex.EncodeToString(hash[:])
 }

@@ -8,6 +8,7 @@ import (
 	"siliconvali/common"
 	"siliconvali/config"
 	"siliconvali/ent"
+	"siliconvali/pkg/util"
 )
 
 type PostgresqlDB struct {
@@ -25,7 +26,7 @@ func New(appConfig config.DbConfig) *PostgresqlDB {
 	ConnetionString := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
 		appConfig.Host, appConfig.DbPort, appConfig.Username, appConfig.DbName, appConfig.Password)
 
-	fmt.Println("ConnetionString:", ConnetionString)
+	fmt.Println("ConnetionString: ", ConnetionString)
 	client, err := ent.Open(dialect.Postgres, ConnetionString)
 	if err != nil {
 		log.Fatalf("failed opening connection to postgres: %v", err)
@@ -52,7 +53,7 @@ func DataSeed(client *ent.Client) {
 		).Save(ctx)
 
 		client.User.Create().
-			SetPassword("@123456@").
+			SetPassword(util.StringToMD5Hash("@123456@")).
 			SetFirstname("Mahdi").
 			SetLastname("Hosseinpour").
 			SetMobile("09339466051").

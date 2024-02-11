@@ -30,11 +30,12 @@ type Migration struct {
 }
 
 type AuthConfig struct {
-	SignKey               string
-	AccessExpirationTime  time.Duration
-	RefreshExpirationTime time.Duration
-	AccessSubject         string
-	RefreshSubject        string
+	SignKey                 string
+	AccessExpirationTime    time.Duration
+	RefreshExpirationTime   time.Duration
+	AccessSubject           string
+	RefreshSubject          string
+	GracefulShutdownTimeout time.Duration
 }
 
 func Initialize() AppConfiguration {
@@ -62,11 +63,12 @@ func Initialize() AppConfiguration {
 			MigrationTable: viper.GetString("Migration.MigrationTable"),
 		},
 		AuthConfig: AuthConfig{
-			SignKey:               viper.GetString("AuthConfig.SignKey"),
-			AccessExpirationTime:  viper.GetDuration("AuthConfig.AccessExpirationTime") * time.Hour,
-			RefreshExpirationTime: viper.GetDuration("AuthConfig.RefreshExpirationTime") * time.Hour * 7,
-			AccessSubject:         viper.GetString("AuthConfig.AccessSubject"),
-			RefreshSubject:        viper.GetString("AuthConfig.RefreshSubject"),
+			SignKey:                 viper.GetString("AuthConfig.SignKey"),
+			AccessExpirationTime:    viper.GetDuration("AuthConfig.AccessExpirationTime") * time.Hour,
+			RefreshExpirationTime:   viper.GetDuration("AuthConfig.RefreshExpirationTime") * time.Hour * 7,
+			AccessSubject:           viper.GetString("AuthConfig.AccessSubject"),
+			RefreshSubject:          viper.GetString("AuthConfig.RefreshSubject"),
+			GracefulShutdownTimeout: viper.GetDuration("GracefulShutdownTimeout") * time.Second,
 		},
 	}
 }

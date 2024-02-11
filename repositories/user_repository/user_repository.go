@@ -144,8 +144,10 @@ func (userRepo *UserRepositoryImpl) GetByMobile(ctx context.Context, mobile stri
 
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return dto.UserInfo{}, richerror.New(op).WithErr(err).
-				WithMessage(errmsg.ErrorMsgNotFound).WithKind(richerror.KindNotFound)
+			return dto.UserInfo{}, richerror.New(op).
+				WithErr(err).
+				WithMessage(errmsg.ErrorMsgNotFound).
+				WithKind(richerror.KindNotFound)
 		}
 
 		return dto.UserInfo{}, richerror.New(op).WithErr(err).
@@ -194,6 +196,7 @@ func UserToUserInfo(user *ent.User) dto.UserInfo {
 	userInfo := dto.UserInfo{
 		UserId:       user.ID,
 		Mobile:       user.Mobile,
+		Password:     user.Password,
 		NationalCode: user.NationalCode,
 		Active:       user.Active,
 		Deleted:      user.Deleted,

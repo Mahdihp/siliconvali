@@ -1,9 +1,10 @@
 package httpserver
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/middleware/logger"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"siliconvali/config"
 	"siliconvali/delivery/httpserver/userhandler"
 	"siliconvali/services/authservice"
@@ -23,6 +24,8 @@ func New(config config.AppConfiguration, authSvc authservice.AuthService, userSv
 		StrictRouting: true,
 		ServerHeader:  "Silicon Ali",
 		AppName:       "Test App v1.0.1",
+		JSONEncoder:   json.Marshal,
+		JSONDecoder:   json.Unmarshal,
 	})
 
 	app.Use(logger.New(logger.Config{
@@ -37,6 +40,7 @@ func New(config config.AppConfiguration, authSvc authservice.AuthService, userSv
 }
 func (s Server) Serve() {
 
+	s.Router.Get("/health-check", s.healthCheck)
 	s.userHandler.SetRoutes(s.Router)
 
 	if err := s.Router.Listen(s.config.Server.Host + s.config.Server.Port); err != nil {
