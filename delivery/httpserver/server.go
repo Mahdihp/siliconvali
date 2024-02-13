@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"siliconvali/config"
 	"siliconvali/delivery/httpserver/userhandler"
 	"siliconvali/services/authservice"
 	"siliconvali/services/userservice"
+	"siliconvali/validator/uservalidator"
 )
 
 type Server struct {
@@ -17,7 +19,7 @@ type Server struct {
 	Router      *fiber.App
 }
 
-func New(config config.AppConfiguration, authSvc authservice.AuthService, userSvc userservice.UserService) Server {
+func New(config config.AppConfiguration, authSvc authservice.AuthService, userSvc userservice.UserService, userValidator uservalidator.Validator) Server {
 
 	app := fiber.New(fiber.Config{
 		CaseSensitive: true,
@@ -31,11 +33,12 @@ func New(config config.AppConfiguration, authSvc authservice.AuthService, userSv
 	app.Use(logger.New(logger.Config{
 		Format: "[${ip}]:${port} ${status} - ${method} ${path}\n",
 	}))
+	app.Use(recover.New())
 
 	return Server{
 		Router:      app,
 		config:      config,
-		userHandler: userhandler.New(config.AuthConfig, authSvc, userSvc),
+		userHandler: userhandler.New(config.AuthConfig, authSvc, userSvc, userValidator),
 	}
 }
 func (s Server) Serve() {

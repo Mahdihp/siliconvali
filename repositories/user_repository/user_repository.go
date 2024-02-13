@@ -19,6 +19,7 @@ type UserRepository interface {
 	Update(ctx context.Context, req dto.UserUpdateRequest) error
 	DeleteById(ctx context.Context, userId int64) error
 	GetByMobile(ctx context.Context, mobile string) (dto.UserInfo, error)
+	IsMobileUnique(ctx context.Context, mobile string) (bool, error)
 	GetById(ctx context.Context, userId int64) (dto.UserInfo, error)
 	GetAll(ctx context.Context, req dto.GetAllUserRequest) ([]dto.UserInfo, error)
 }
@@ -31,6 +32,25 @@ func New(conn *postgres.PostgresqlDB) *UserRepositoryImpl {
 	return &UserRepositoryImpl{
 		conn: conn,
 	}
+}
+
+func (userRepo *UserRepositoryImpl) IsMobileUnique(ctx context.Context, mobile string) (bool, error) {
+	const op = "user_repository.IsMobileUnique"
+
+	found, err := userRepo.conn.Conn().User.Query().
+		Where(sql.FieldEQ(user.FieldMobile, mobile)).
+		Exist(ctx)
+
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return true, richerror.New(op).WithErr(err).
+				WithMessage(errmsg.ErrorMsgNotFound).WithKind(richerror.KindNotFound)
+		}
+		return false, richerror.New(op).WithErr(err).
+			WithMessage(errmsg.ErrorMsgCantScanQueryResult).WithKind(richerror.KindUnexpected)
+	}
+
+	return found, nil
 }
 
 func (userRepo *UserRepositoryImpl) DeleteById(ctx context.Context, userId int64) error {
@@ -83,6 +103,7 @@ func (userRepo *UserRepositoryImpl) GetAll(ctx context.Context, req dto.GetAllUs
 		Order(ent.Desc(user.FieldCreatedAt)).
 		Limit(req.PageSize).
 		Offset(req.PageIndex).
+		WithRoles().
 		All(ctx)
 
 	if err != nil {
@@ -188,6 +209,7 @@ func (userRepo UserRepositoryImpl) Update(ctx context.Context, req dto.UserUpdat
 func UsersToUserInfos(users []*ent.User) []dto.UserInfo {
 	var userInfos []dto.UserInfo
 	for _, u := range users {
+
 		userInfos = append(userInfos, UserToUserInfo(u))
 	}
 	return userInfos
@@ -200,6 +222,13 @@ func UserToUserInfo(user *ent.User) dto.UserInfo {
 		NationalCode: user.NationalCode,
 		Active:       user.Active,
 		Deleted:      user.Deleted,
+	}
+	for _, role := range user.Edges.Roles {
+		userInfo.Roles = append(userInfo.Roles, dto.RoleInfo{
+			Id:          role.ID,
+			Name:        role.Name,
+			Description: *role.Description,
+		})
 	}
 	if user.Address != nil {
 		userInfo.Address = *user.Address

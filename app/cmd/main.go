@@ -12,6 +12,7 @@ import (
 	"siliconvali/repositories/user_repository"
 	"siliconvali/services/authservice"
 	"siliconvali/services/userservice"
+	"siliconvali/validator/uservalidator"
 )
 
 var AppConfig config.AppConfiguration
@@ -23,8 +24,8 @@ func init() {
 }
 func main() {
 
-	authService, userService := setupServices(AppConfig)
-	server := httpserver.New(AppConfig, authService, userService)
+	authService, userService, uv := setupServices(AppConfig)
+	server := httpserver.New(AppConfig, authService, userService, uv)
 	go func() {
 		server.Serve()
 	}()
@@ -45,7 +46,9 @@ func main() {
 	<-ctxWithTimeout.Done()
 }
 
-func setupServices(cfg config.AppConfiguration) (authservice.AuthService, userservice.UserService) {
+func setupServices(cfg config.AppConfiguration) (
+	authservice.AuthService,
+	userservice.UserService, uservalidator.Validator) {
 
 	postgresqlDB := postgres.New(cfg.DbConfig)
 
@@ -53,7 +56,8 @@ func setupServices(cfg config.AppConfiguration) (authservice.AuthService, userse
 
 	userRepositoryImpl := user_repository.New(postgresqlDB)
 	userService := userservice.New(authSvc, userRepositoryImpl)
+	uV := uservalidator.New(userRepositoryImpl)
 
-	return authSvc, userService
+	return authSvc, userService, uV
 
 }

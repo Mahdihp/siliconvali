@@ -30,14 +30,14 @@ type Tokens struct {
 type UserInfo struct {
 	UserId       int64      `json:"user_id"`
 	Mobile       string     `json:"mobile"`
-	Password     string     `json:"password"`
+	Password     string     `json:"-"`
 	FirstName    string     `json:"first_name"`
 	LastName     string     `json:"last_name"`
 	NationalCode string     `json:"national_code"`
 	Active       bool       `json:"active"`
 	Deleted      bool       `json:"deleted"`
 	Address      string     `json:"address"`
-	Roles        []RoleInfo `json:"role_id"`
+	Roles        []RoleInfo `json:"roles"`
 }
 
 type GetAllUserRequest struct {

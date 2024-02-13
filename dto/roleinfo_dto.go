@@ -1,7 +1,7 @@
 package dto
 
 type RoleInfo struct {
-	RoleID      int16  `json:"role_id"`
+	Id          int16  `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }

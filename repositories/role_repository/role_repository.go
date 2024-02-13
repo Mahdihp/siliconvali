@@ -51,7 +51,7 @@ func (receiver RoleRepositoryImpl) GetAll(ctx context.Context, req dto.GetAllRol
 	var roleInfos []dto.RoleInfo
 	for _, r := range roles {
 		roleInfos = append(roleInfos, dto.RoleInfo{
-			RoleID:      r.ID,
+			Id:          r.ID,
 			Name:        r.Name,
 			Description: *r.Description,
 		})

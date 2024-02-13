@@ -43,7 +43,7 @@ func (receiver UserService) Login(ctx context.Context, req dto.LoginRequest) (dt
 			WithMeta(map[string]interface{}{"mobile": req.Mobile})
 	}
 	hash := util.StringToMD5Hash(req.Password)
-	fmt.Println(user.Password != hash)
+	//fmt.Println(user.Password != hash)
 
 	if user.Password != hash {
 		return dto.LoginResponse{}, fmt.Errorf(errmsg.ErrorMsg_User_Incorrect_User_Pass)
