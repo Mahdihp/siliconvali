@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"net/http"
 	"siliconvali/config"
+	"siliconvali/delivery/httpserver/middleware"
 	"siliconvali/dto"
 	"siliconvali/pkg/httpmsg"
 	"siliconvali/services/authservice"
@@ -13,15 +14,17 @@ import (
 )
 
 type Handler struct {
+	ctx           *fiber.Ctx
 	authConfig    config.AuthConfig
 	authSvc       authservice.AuthService
 	userSvc       userservice.UserService
 	userValidator uservalidator.Validator
 }
 
-func New(authConfig config.AuthConfig, authSvc authservice.AuthService,
+func New(ctx *fiber.Ctx, authConfig config.AuthConfig, authSvc authservice.AuthService,
 	userSvc userservice.UserService, userValidator uservalidator.Validator) Handler {
 	return Handler{
+		ctx:           ctx,
 		authConfig:    authConfig,
 		authSvc:       authSvc,
 		userSvc:       userSvc,
@@ -32,6 +35,11 @@ func (h Handler) SetRoutes(e *fiber.App) {
 	userGroup := e.Group("/users")
 
 	userGroup.Post("/login", h.userLogin)
+
+	//userGroup.Use(middleware.Protected(h.authConfig))
+	userGroup.Use(middleware.NewAuthMiddleware(h.ctx).
+		AddService(h.authSvc, h.authConfig).Authorization())
+
 	userGroup.Post("/all", h.getAll)
 	userGroup.Post("/register", h.userRegister)
 }
@@ -61,7 +69,6 @@ func (h Handler) userRegister(c *fiber.Ctx) error {
 	data := dto.NewBaseResponse(http.StatusOK).WithData(resp)
 	return c.Status(http.StatusCreated).JSON(data)
 }
-
 func (h Handler) getAll(c *fiber.Ctx) error {
 	var req dto.GetAllUserRequest
 	if err := c.BodyParser(&req); err != nil {

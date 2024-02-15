@@ -1,6 +1,7 @@
 package authservice
 
 import (
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"siliconvali/config"
 	"siliconvali/dto"
@@ -27,13 +28,14 @@ func (s AuthService) CreateRefreshToken(user dto.UserInfo) (string, error) {
 
 func (s AuthService) ParseToken(bearerToken string) (*Claims, error) {
 	//https://pkg.go.dev/github.com/golang-jwt/jwt/v5#example-ParseWithClaims-CustomClaimsType
-
+	fmt.Println(bearerToken)
 	tokenStr := strings.Replace(bearerToken, "Bearer ", "", 1)
 
 	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(s.config.SignKey), nil
 	})
 	if err != nil {
+
 		return nil, err
 	}
 

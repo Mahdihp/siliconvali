@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"siliconvali/config"
 	"siliconvali/delivery/httpserver/userhandler"
 	"siliconvali/services/authservice"
@@ -33,7 +35,16 @@ func New(config config.AppConfiguration, authSvc authservice.AuthService, userSv
 	app.Use(logger.New(logger.Config{
 		Format: "[${ip}]:${port} ${status} - ${method} ${path}\n",
 	}))
+
+	app.Use(requestid.New(requestid.Config{
+		Header: "X-Custom-Header",
+		Generator: func() string {
+			return "static-id"
+		},
+	}))
+
 	app.Use(recover.New())
+	app.Use(healthcheck.New())
 
 	return Server{
 		Router:      app,
