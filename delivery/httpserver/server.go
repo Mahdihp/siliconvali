@@ -13,6 +13,7 @@ import (
 	"siliconvali/services/authservice"
 	"siliconvali/services/userservice"
 	"siliconvali/validator/uservalidator"
+	"time"
 )
 
 type Server struct {
@@ -46,6 +47,25 @@ func New(config config.AppConfiguration, authSvc authservice.AuthService, userSv
 	app.Use(recover.New())
 	app.Use(healthcheck.New())
 
+	app.Use(healthcheck.New(healthcheck.Config{
+		LivenessProbe: func(c *fiber.Ctx) bool {
+			err := c.Status(200).JSON(fiber.Map{"time": time.Now().String()})
+			if err != nil {
+				return false
+			}
+			return true
+		},
+		LivenessEndpoint: "/live",
+		ReadinessProbe: func(c *fiber.Ctx) bool {
+			err := c.Status(200).JSON(fiber.Map{"time": time.Now().String()})
+			if err != nil {
+				return false
+			}
+			return true
+		},
+		ReadinessEndpoint: "/ready",
+	}))
+
 	return Server{
 		Router:      app,
 		config:      config,
@@ -54,7 +74,7 @@ func New(config config.AppConfiguration, authSvc authservice.AuthService, userSv
 }
 func (s Server) Serve() {
 
-	s.Router.Get("/health-check", s.healthCheck)
+	//s.Router.Get("/health-check", s.healthCheck)
 	s.userHandler.SetRoutes(s.Router)
 
 	if err := s.Router.Listen(s.config.Server.Host + s.config.Server.Port); err != nil {

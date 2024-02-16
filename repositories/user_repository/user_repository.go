@@ -82,6 +82,7 @@ func (userRepo *UserRepositoryImpl) GetById(ctx context.Context, userId int64) (
 
 	userFound, err := userRepo.conn.Conn().User.Query().
 		Where(sql.FieldEQ(user.FieldID, userId)).
+		WithRoles().
 		First(ctx)
 
 	if err != nil {
@@ -161,6 +162,7 @@ func (userRepo *UserRepositoryImpl) GetByMobile(ctx context.Context, mobile stri
 
 	userFound, err := userRepo.conn.Conn().User.Query().
 		Where(sql.FieldEQ(user.FieldMobile, mobile)).
+		WithRoles().
 		First(ctx)
 
 	if err != nil {
